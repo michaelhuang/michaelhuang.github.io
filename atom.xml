@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://michaelhuang.github.io/"/>
-  <updated>2016-03-18T05:42:54.000Z</updated>
+  <updated>2016-04-15T15:06:25.000Z</updated>
   <id>http://michaelhuang.github.io/</id>
   
   <author>
@@ -14,6 +14,32 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Hive实现拉链存储</title>
+    <link href="http://michaelhuang.github.io/2015/hive%E5%AE%9E%E7%8E%B0%E6%8B%89%E9%93%BE%E5%AD%98%E5%82%A8/"/>
+    <id>http://michaelhuang.github.io/2015/hive实现拉链存储/</id>
+    <published>2015-04-01T13:30:20.000Z</published>
+    <updated>2016-04-15T15:06:25.000Z</updated>
+    
+    <content type="html">&lt;p&gt;什么是拉链存储？数据仓库经常用到，通过给record增加两个字段: 生效日期、失效日期，来记录数据的生命周期变化；好处是既节省存储空间，又保证历史数据变化的完整性，最重要的还能快速访问不同时段的数据快照&lt;/p&gt;
+&lt;p&gt;那为什么叫拉链呢？因为每回新更新record进来后，都会对旧record进行闭链（更改失效日期），同时对新record开链（更改生效日期），就像链条一样，一环扣一环&lt;/p&gt;
+&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;
+&lt;p&gt;下面以用户数据为例：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://michaelhuang.qiniudn.com/hive-lalian01.png&quot; alt=&quot;用户基本信息&quot;&gt;&lt;br&gt;&lt;img src=&quot;http://michaelhuang.qiniudn.com/hive-lalian02.png&quot; alt=&quot;数据一生&quot;&gt;&lt;br&gt;&lt;img src=&quot;http://michaelhuang.qiniudn.com/hive-lalian03.png&quot; alt=&quot;加入拉链日期&quot;&gt;&lt;br&gt;&lt;img src=&quot;http://michaelhuang.qiniudn.com/hive-lalian04.png&quot; alt=&quot;取某天快照&quot;&gt;&lt;br&gt;&lt;img src=&quot;http://michaelhuang.qiniudn.com/hive-lalian05.png&quot; alt=&quot;取一段时间快照&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;Hive-ODPS实现方法&quot;&gt;&lt;a href=&quot;#Hive-ODPS实现方法&quot; class=&quot;headerlink&quot; title=&quot;Hive/ODPS实现方法&quot;&gt;&lt;/a&gt;Hive/ODPS实现方法&lt;/h2&gt;&lt;p&gt;Hive两个特性：&lt;code&gt;only write once&lt;/code&gt;, &lt;code&gt;schema on read&lt;/code&gt;&lt;br&gt;一般来说存储底层是HDFS（当然有可能是spark或其他，本文不考虑），所以是做不了update的，update成本都不如覆盖重写了，可以考虑利用&lt;a href=&quot;https://cwiki.apache.org/confluence/display/Hive/LanguageManual+WindowingAndAnalytics&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;LEAD Function&lt;/a&gt;解决&lt;/p&gt;
+&lt;figure class=&quot;highlight sql&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;6&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;7&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;8&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;9&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;10&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;11&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;12&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;13&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;14&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;15&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;16&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;17&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;18&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;19&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;20&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;21&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;22&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;23&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;24&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;25&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;26&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;27&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;28&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;29&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;SELECT&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        PRIMARY_KEY,&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        EFFECTIVE_DT,&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        &lt;span class=&quot;keyword&quot;&gt;CASE&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;          &lt;span class=&quot;keyword&quot;&gt;WHEN&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;LEAD&lt;/span&gt;(EFFECTIVE_DT,&lt;span class=&quot;number&quot;&gt;1&lt;/span&gt;,&lt;span class=&quot;literal&quot;&gt;null&lt;/span&gt;)&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;            &lt;span class=&quot;keyword&quot;&gt;OVER&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;              (&lt;span class=&quot;keyword&quot;&gt;PARTITION&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;BY&lt;/span&gt; PRIMARY_KEY &lt;span class=&quot;keyword&quot;&gt;ORDER&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;BY&lt;/span&gt; EFFECTIVE_DT)&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;                 &lt;span class=&quot;keyword&quot;&gt;IS&lt;/span&gt; &lt;span class=&quot;literal&quot;&gt;NULL&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;THEN&lt;/span&gt; &lt;span class=&quot;literal&quot;&gt;NULL&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;          &lt;span class=&quot;keyword&quot;&gt;ELSE&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;LEAD&lt;/span&gt;(EFFECTIVE_DT,&lt;span class=&quot;number&quot;&gt;1&lt;/span&gt;,&lt;span class=&quot;literal&quot;&gt;null&lt;/span&gt;)&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;            &lt;span class=&quot;keyword&quot;&gt;OVER&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;              (&lt;span class=&quot;keyword&quot;&gt;PARTITION&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;BY&lt;/span&gt; PRIMARY_KEY &lt;span class=&quot;keyword&quot;&gt;ORDER&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;BY&lt;/span&gt; EFFECTIVE_DT)&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        &lt;span class=&quot;keyword&quot;&gt;END&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;AS&lt;/span&gt; EXPIRED_DT,&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        EVENT_VALUE&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;       &lt;span class=&quot;keyword&quot;&gt;FROM&lt;/span&gt; (&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;         &lt;span class=&quot;keyword&quot;&gt;SELECT&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;           PRIMARY_KEY,&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;           EFFECTIVE_DT,&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;           EVENT_VALUE&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;         &lt;span class=&quot;keyword&quot;&gt;FROM&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;           EXISTING_TIME_SERIES_TABLE&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;         &lt;span class=&quot;keyword&quot;&gt;WHERE&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;           EXPIRED_DT &lt;span class=&quot;keyword&quot;&gt;IS&lt;/span&gt; &lt;span class=&quot;literal&quot;&gt;NULL&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;         &lt;span class=&quot;keyword&quot;&gt;UNION&lt;/span&gt; ALL&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;         &lt;span class=&quot;keyword&quot;&gt;SELECT&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;           PRIMARY_KEY,&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;           EFFECTIVE_DT,&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;           EVENT_VALUE&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;         &lt;span class=&quot;keyword&quot;&gt;FROM&lt;/span&gt; NEW_TIME_SERIES_TABLE&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;       ) sub_1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;什么是拉链存储？数据仓库经常用到，通过给record增加两个字段: 生效日期、失效日期，来记录数据的生命周期变化；好处是既节省存储空间，又保证历史数据变化的完整性，最重要的还能快速访问不同时段的数据快照&lt;/p&gt;
+&lt;p&gt;那为什么叫拉链呢？因为每回新更新record进来后，都会对旧record进行闭链（更改失效日期），同时对新record开链（更改生效日期），就像链条一样，一环扣一环&lt;/p&gt;
+    
+    </summary>
+    
+    
+  </entry>
   
   <entry>
     <title>锤子发布会</title>
@@ -166,16 +192,16 @@
     <link href="http://michaelhuang.github.io/2014/20140331_pic_test/"/>
     <id>http://michaelhuang.github.io/2014/20140331_pic_test/</id>
     <published>2014-03-30T19:00:17.000Z</published>
-    <updated>2016-03-18T03:13:14.000Z</updated>
+    <updated>2016-04-15T14:11:20.000Z</updated>
     
-    <content type="html">&lt;p&gt;&lt;strong&gt;Give me the name, I’ll give U the blood&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;http://wholetsthedogout.qiniudn.com/games/04.jpg&quot; alt=&quot;Give me the name, I&amp;#39;ll give U the blood&quot;&gt;&lt;/p&gt;
+    <content type="html">&lt;p&gt;&lt;strong&gt;Give me the name, I’ll give U the blood&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;http://michaelhuang.qiniudn.com/games/04.jpg&quot; alt=&quot;Give me the name, I&amp;#39;ll give U the blood&quot;&gt;&lt;/p&gt;
 &lt;a id=&quot;more&quot;&gt;&lt;/a&gt;
-&lt;p&gt;&lt;strong&gt;Speak to me or speak to God&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;http://wholetsthedogout.qiniudn.com/games/01.jpg&quot; alt=&quot;Speak to me or speak to God&quot;&gt;&lt;br&gt;&lt;strong&gt;We work in the dark and serve the lights,we are assassins&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;http://wholetsthedogout.qiniudn.com/games/03.jpg&quot; alt=&quot;We work in the dark and serve the lights,we are assassins&quot;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Speak to me or speak to God&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;http://michaelhuang.qiniudn.com/games/01.jpg&quot; alt=&quot;Speak to me or speak to God&quot;&gt;&lt;br&gt;&lt;strong&gt;We work in the dark and serve the lights,we are assassins&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;http://michaelhuang.qiniudn.com/games/03.jpg&quot; alt=&quot;We work in the dark and serve the lights,we are assassins&quot;&gt;&lt;/p&gt;
 </content>
     
     <summary type="html">
     
-      &lt;p&gt;&lt;strong&gt;Give me the name, I’ll give U the blood&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;http://wholetsthedogout.qiniudn.com/games/04.jpg&quot; alt=&quot;Give me the name, I&amp;#39;ll give U the blood&quot;&gt;&lt;/p&gt;
+      &lt;p&gt;&lt;strong&gt;Give me the name, I’ll give U the blood&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;http://michaelhuang.qiniudn.com/games/04.jpg&quot; alt=&quot;Give me the name, I&amp;#39;ll give U the blood&quot;&gt;&lt;/p&gt;
     
     </summary>
     
