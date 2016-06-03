@@ -2,9 +2,23 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://michaelhuang.github.io/2016/Spring-test-dbunit/</loc>
+    
+    <lastmod>2016-06-03T14:52:49.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://michaelhuang.github.io/2016/hive%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96/</loc>
+    
+    <lastmod>2016-05-28T12:57:46.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://michaelhuang.github.io/2016/hive%E5%AE%9E%E7%8E%B0%E6%8B%89%E9%93%BE%E5%AD%98%E5%82%A8/</loc>
     
-    <lastmod>2016-05-05T11:48:32.000Z</lastmod>
+    <lastmod>2016-05-28T10:27:53.000Z</lastmod>
     
   </url>
   
