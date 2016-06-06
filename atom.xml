@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://michaelhuang.github.io/"/>
-  <updated>2016-06-03T14:52:49.000Z</updated>
+  <updated>2016-06-06T15:14:55.000Z</updated>
   <id>http://michaelhuang.github.io/</id>
   
   <author>
@@ -14,6 +14,41 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>MIT线代笔记</title>
+    <link href="http://michaelhuang.github.io/2016/MIT%E7%BA%BF%E4%BB%A3%E7%AC%94%E8%AE%B0/"/>
+    <id>http://michaelhuang.github.io/2016/MIT线代笔记/</id>
+    <published>2016-06-06T14:08:08.000Z</published>
+    <updated>2016-06-06T15:14:55.000Z</updated>
+    
+    <content type="html">&lt;blockquote&gt;
+&lt;p&gt;醍醐灌顶！大师告诉你WHY！以前学的都是HOW，哎，日了狗了&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;
+&lt;p&gt;高斯消元法：矩阵左乘行向量实现消元&lt;/p&gt;
+&lt;p&gt;以空间向量的角度来思考矩阵乘法：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;左乘行向量表示对原矩阵的行向量进行线性组合&lt;/li&gt;
+&lt;li&gt;右乘列向量表示对原矩阵的列向量进行线性组合&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;$$&lt;br&gt;\begin{bmatrix}&lt;br&gt;columns1 &amp;amp; columns2 &amp;amp; columns3 \\&lt;br&gt;columns1 &amp;amp; columns2 &amp;amp; columns3 \\&lt;br&gt;columns1 &amp;amp; columns2 &amp;amp; columns3&lt;br&gt;\end{bmatrix}&lt;br&gt;\begin{bmatrix}&lt;br&gt;3 \\&lt;br&gt;4 \\&lt;br&gt;5&lt;br&gt;\end{bmatrix}&lt;br&gt;=&lt;br&gt;\begin{bmatrix}&lt;br&gt;3*columns1 \\&lt;br&gt;4*columns1 \\&lt;br&gt;5*columns1&lt;br&gt;\end{bmatrix} \tag{1}&lt;br&gt;$$&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;em&gt;the result of multiplying a matrix by some vector is a combination of the columns of the matrix&lt;/em&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;em&gt;待续…&lt;/em&gt;&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;醍醐灌顶！大师告诉你WHY！以前学的都是HOW，哎，日了狗了&lt;/p&gt;
+&lt;/blockquote&gt;
+    
+    </summary>
+    
+    
+  </entry>
   
   <entry>
     <title>Spring Test Dbunit</title>
@@ -56,6 +91,180 @@
 &lt;/blockquote&gt;
 &lt;figure class=&quot;highlight java&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;meta&quot;&gt;@Test&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;meta&quot;&gt;@DataSets&lt;/span&gt;(setUpDataSet = &lt;span class=&quot;string&quot;&gt;&quot;setUp.xls&quot;&lt;/span&gt;, expectDataSet = &lt;span class=&quot;string&quot;&gt;&quot;expect.xls&quot;&lt;/span&gt;)&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;test&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;()&lt;/span&gt; &lt;/span&gt;&amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&amp;#125;&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
 &lt;p&gt;测试方法执行前，先load&lt;code&gt;setUp.xls&lt;/code&gt;中数据到测试库，测试方法结束后，自动和&lt;code&gt;expect.xls&lt;/code&gt;中数据做比对；excel里面保存的是表的数据，多个表以多个sheet页形式体现，&lt;code&gt;sheet name&lt;/code&gt;即是&lt;code&gt;table name&lt;/code&gt;；其实github上已经有个功能非常完善的工具&lt;a href=&quot;http://springtestdbunit.github.io/spring-test-dbunit/index.html&quot;&gt;Spring Test DBUnit&lt;/a&gt;，这里只是说下大体实现思路&lt;/p&gt;
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Hive + Hdfs-File-Slurper进行简单文本预处理</title>
+    <link href="http://michaelhuang.github.io/2016/Hive-hdfs-file-slurper%E8%BF%9B%E8%A1%8C%E7%AE%80%E5%8D%95%E6%96%87%E6%9C%AC%E9%A2%84%E5%A4%84%E7%90%86/"/>
+    <id>http://michaelhuang.github.io/2016/Hive-hdfs-file-slurper进行简单文本预处理/</id>
+    <published>2016-04-04T14:04:51.000Z</published>
+    <updated>2016-06-05T16:03:24.000Z</updated>
+    
+    <content type="html">&lt;blockquote&gt;
+&lt;p&gt;应用场景：每天固定时间，会有海量的文本文件，文本数据是以增量形式提供，现在需要每天都能获得全量的保存有最新记录的数据&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;
+&lt;p&gt;这算是一个典型的简单ETL过程，先来看看利用hadoop生态圈，data ingestion选型的时候需要考虑哪些因素&lt;/p&gt;
+&lt;h2 id=&quot;Data-Ingestion-Considerations&quot;&gt;&lt;a href=&quot;#Data-Ingestion-Considerations&quot; class=&quot;headerlink&quot; title=&quot;Data Ingestion Considerations&quot;&gt;&lt;/a&gt;Data Ingestion Considerations&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;Timeliness of data ingestion and accessibility&lt;br&gt;数据导入频率什么级别，需要多久能供下游使用？&lt;/li&gt;
+&lt;/ul&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;classifications&lt;/th&gt;
+&lt;th&gt;timeliness requirements&lt;/th&gt;
+&lt;th&gt;tools&lt;/th&gt;
+&lt;th&gt;storage layer&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Macro batch&lt;/td&gt;
+&lt;td&gt;&amp;gt;    15 minutes&lt;/td&gt;
+&lt;td&gt;Sqoop, file transfers&lt;/td&gt;
+&lt;td&gt;HDFS&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Microbatch&lt;/td&gt;
+&lt;td&gt;&amp;gt;     2 minutes&lt;/td&gt;
+&lt;td&gt;Sqoop, file transfers&lt;/td&gt;
+&lt;td&gt;HDFS&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Near-Real-Time Decision Support&lt;/td&gt;
+&lt;td&gt;&amp;gt;     2 seconds&lt;/td&gt;
+&lt;td&gt;Flume, Kafka&lt;/td&gt;
+&lt;td&gt;HBase, Solr&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Near-Real-Time Event Processing&lt;/td&gt;
+&lt;td&gt;&amp;gt;   100 milliseconds&lt;/td&gt;
+&lt;td&gt;Flume, Kafka&lt;/td&gt;
+&lt;td&gt;HBase, Solr&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Real Time&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;custom&lt;/td&gt;
+&lt;td&gt;custom&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;ul&gt;
+&lt;li&gt;Storage format&lt;br&gt;存储格式主要这几种，纯文本，Hadoop原生的Sequence File，序列化Avro，列存储Parquet和ORC(optimized RCFile)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;format&lt;/th&gt;
+&lt;th&gt;read&lt;/th&gt;
+&lt;th&gt;write&lt;/th&gt;
+&lt;th&gt;schema evolution&lt;/th&gt;
+&lt;th&gt;compression&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Text&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Sequence File&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Avro&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Parquet&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;ORC&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;compression&lt;/th&gt;
+&lt;th&gt;size&lt;/th&gt;
+&lt;th&gt;speed&lt;/th&gt;
+&lt;th&gt;splittable&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Snappy&lt;/td&gt;
+&lt;td&gt;good trade-off&lt;/td&gt;
+&lt;td&gt;good trade-off&lt;/td&gt;
+&lt;td&gt;not inherently splittable, need a container format like SequenceFiles or Avro&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;LZO&lt;/td&gt;
+&lt;td&gt;normal&lt;/td&gt;
+&lt;td&gt;optimized&lt;/td&gt;
+&lt;td&gt;splittable, requires an additional indexing step&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Gzip&lt;/td&gt;
+&lt;td&gt;2.5 times compression that’d be offered by Snappy&lt;/td&gt;
+&lt;td&gt;write half of Snappy&lt;br&gt;read as well as Snappy&lt;/td&gt;
+&lt;td&gt;not inherently splittable, need a container format like SequenceFiles or Avro&lt;br&gt;using smaller blocks can lead to better performance&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;bzip2&lt;/td&gt;
+&lt;td&gt;9% better than GZip&lt;/td&gt;
+&lt;td&gt;10 times slower than GZip&lt;/td&gt;
+&lt;td&gt;inherently splittable&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;从表中可以看出，大多数情况使用Snappy即可；如果是纯文本则使用LZO会更好一些；如果对写速度没啥要求，可以使用Gzip；如果对读写都没啥要求，那不如bzip2了&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Incremental updates&lt;br&gt;新数据以什么形式落地？append or overwrite?&lt;/li&gt;
+&lt;li&gt;Data access pattern&lt;br&gt;Will the data be used in processing? If so, will it be used in batch processing jobs? Or is random access to the data required?&lt;/li&gt;
+&lt;li&gt;Source system and data structure&lt;br&gt;数据源类型：RDBMS or Logs？数据类型：structured、semistructured or unstructured?&lt;/li&gt;
+&lt;li&gt;Transformations, Partitioning and splitting&lt;br&gt;如何规划分区？数据需要导入到多个目标系统（HDFS, HBase）?&lt;/li&gt;
+&lt;li&gt;Network Bottlenecks&lt;/li&gt;
+&lt;li&gt;Network Security&lt;/li&gt;
+&lt;li&gt;Failure Handling&lt;/li&gt;
+&lt;li&gt;Level of Complexity&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Spooling Directory Source&lt;br&gt;slurper&lt;/p&gt;
+&lt;h2 id=&quot;Reference&quot;&gt;&lt;a href=&quot;#Reference&quot; class=&quot;headerlink&quot; title=&quot;Reference&quot;&gt;&lt;/a&gt;Reference&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://www.manning.com/books/hadoop-in-action-second-edition&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Hadoop in Action&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;http://shop.oreilly.com/product/0636920033196.do&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Hadoop Application Architectures&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;http://www.slideshare.net/StampedeCon/choosing-an-hdfs-data-storage-format-avro-vs-parquet-and-more-stampedecon-2015&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Choosing an HDFS data storage format&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://www.linkedin.com/pulse/100-open-source-big-data-architecture-papers-anil-madan&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;100 open source Big Data architecture papers for data professionals&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;应用场景：每天固定时间，会有海量的文本文件，文本数据是以增量形式提供，现在需要每天都能获得全量的保存有最新记录的数据&lt;/p&gt;
+&lt;/blockquote&gt;
     
     </summary>
     
@@ -145,6 +354,46 @@
       &lt;blockquote&gt;
 &lt;p&gt;什么是拉链存储？数据仓库经常用到，通过给record增加两个字段: 生效日期、失效日期，来记录数据的生命周期变化；好处是既节省存储空间，又保证历史数据变化的完整性，最重要的还能快速访问不同时段的数据快照&lt;/p&gt;
 &lt;/blockquote&gt;
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Vagrant, Puppet, Testing &amp; Hadoop</title>
+    <link href="http://michaelhuang.github.io/2015/Vagrant-Puppet-Testing-Hadoop/"/>
+    <id>http://michaelhuang.github.io/2015/Vagrant-Puppet-Testing-Hadoop/</id>
+    <published>2015-12-27T05:19:54.000Z</published>
+    <updated>2016-06-06T15:43:56.000Z</updated>
+    
+    <content type="html">&lt;blockquote&gt;
+&lt;p&gt;是否被频繁的本地搭建hadoop测试集群烦的一13？vim ssh scp..%$#@! orz…&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;快来试试&lt;a href=&quot;https://github.com/michaelhuang/4-nodes-CDH5-vagrant&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;4节点CDH集群&lt;/a&gt;！&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;自动分配mem,cpu&lt;/li&gt;
+&lt;li&gt;阿里repo&lt;/li&gt;
+&lt;li&gt;关闭防火墙，启动ntp&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;a href=&quot;https://github.com/DandyDev/virtual-hadoop-cluster&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;这个&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;或者 &lt;a href=&quot;https://github.com/dnafrance/vagrant-hadoop-spark-cluster&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;这个&lt;/a&gt;!&lt;/p&gt;
+&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;是否被频繁的本地搭建hadoop测试集群烦的一13？vim ssh scp..%$#@! orz…&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;快来试试&lt;a href=&quot;https://github.com/michaelhuang/4-nodes-CDH5-vagrant&quot;&gt;4节点CDH集群&lt;/a&gt;！&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;自动分配mem,cpu&lt;/li&gt;
+&lt;li&gt;阿里repo&lt;/li&gt;
+&lt;li&gt;关闭防火墙，启动ntp&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;a href=&quot;https://github.com/DandyDev/virtual-hadoop-cluster&quot;&gt;这个&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;或者 &lt;a href=&quot;https://github.com/dnafrance/vagrant-hadoop-spark-cluster&quot;&gt;这个&lt;/a&gt;!&lt;/p&gt;
     
     </summary>
     

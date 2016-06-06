@@ -1,0 +1,155 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> Hive + Hdfs-File-Slurper进行简单文本预处理 · learn to love less</title><meta name="description" content="Hive + Hdfs-File-Slurper进行简单文本预处理 - huangzhf"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="short icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="stylesheet" href="http://fonts.useso.com/css?family=Source+Sans+Pro:400,600" type="text/css"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="https://twitter.com/ZhengfeiHuang" target="_blank" class="nav-list-link">TWITTER</a></li><li class="nav-list-item"><a href="https://github.com/michaelhuang" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><section class="container"><div class="post"><article class="post-block"><h1 class="post-title">Hive + Hdfs-File-Slurper进行简单文本预处理</h1><div class="post-info">Apr 4, 2016</div><div class="post-content"><blockquote>
+<p>应用场景：每天固定时间，会有海量的文本文件，文本数据是以增量形式提供，现在需要每天都能获得全量的保存有最新记录的数据</p>
+</blockquote>
+<a id="more"></a>
+<p>这算是一个典型的简单ETL过程，先来看看利用hadoop生态圈，data ingestion选型的时候需要考虑哪些因素</p>
+<h2 id="Data-Ingestion-Considerations"><a href="#Data-Ingestion-Considerations" class="headerlink" title="Data Ingestion Considerations"></a>Data Ingestion Considerations</h2><ul>
+<li>Timeliness of data ingestion and accessibility<br>数据导入频率什么级别，需要多久能供下游使用？</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>classifications</th>
+<th>timeliness requirements</th>
+<th>tools</th>
+<th>storage layer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Macro batch</td>
+<td>&gt;    15 minutes</td>
+<td>Sqoop, file transfers</td>
+<td>HDFS</td>
+</tr>
+<tr>
+<td>Microbatch</td>
+<td>&gt;     2 minutes</td>
+<td>Sqoop, file transfers</td>
+<td>HDFS</td>
+</tr>
+<tr>
+<td>Near-Real-Time Decision Support</td>
+<td>&gt;     2 seconds</td>
+<td>Flume, Kafka</td>
+<td>HBase, Solr</td>
+</tr>
+<tr>
+<td>Near-Real-Time Event Processing</td>
+<td>&gt;   100 milliseconds</td>
+<td>Flume, Kafka</td>
+<td>HBase, Solr</td>
+</tr>
+<tr>
+<td>Real Time</td>
+<td></td>
+<td>custom</td>
+<td>custom</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Storage format<br>存储格式主要这几种，纯文本，Hadoop原生的Sequence File，序列化Avro，列存储Parquet和ORC(optimized RCFile)</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>format</th>
+<th>read</th>
+<th>write</th>
+<th>schema evolution</th>
+<th>compression</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Text</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Sequence File</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Avro</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Parquet</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>ORC</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>compression</th>
+<th>size</th>
+<th>speed</th>
+<th>splittable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Snappy</td>
+<td>good trade-off</td>
+<td>good trade-off</td>
+<td>not inherently splittable, need a container format like SequenceFiles or Avro</td>
+</tr>
+<tr>
+<td>LZO</td>
+<td>normal</td>
+<td>optimized</td>
+<td>splittable, requires an additional indexing step</td>
+</tr>
+<tr>
+<td>Gzip</td>
+<td>2.5 times compression that’d be offered by Snappy</td>
+<td>write half of Snappy<br>read as well as Snappy</td>
+<td>not inherently splittable, need a container format like SequenceFiles or Avro<br>using smaller blocks can lead to better performance</td>
+</tr>
+<tr>
+<td>bzip2</td>
+<td>9% better than GZip</td>
+<td>10 times slower than GZip</td>
+<td>inherently splittable</td>
+</tr>
+</tbody>
+</table>
+<p>从表中可以看出，大多数情况使用Snappy即可；如果是纯文本则使用LZO会更好一些；如果对写速度没啥要求，可以使用Gzip；如果对读写都没啥要求，那不如bzip2了</p>
+<ul>
+<li>Incremental updates<br>新数据以什么形式落地？append or overwrite?</li>
+<li>Data access pattern<br>Will the data be used in processing? If so, will it be used in batch processing jobs? Or is random access to the data required?</li>
+<li>Source system and data structure<br>数据源类型：RDBMS or Logs？数据类型：structured、semistructured or unstructured?</li>
+<li>Transformations, Partitioning and splitting<br>如何规划分区？数据需要导入到多个目标系统（HDFS, HBase）?</li>
+<li>Network Bottlenecks</li>
+<li>Network Security</li>
+<li>Failure Handling</li>
+<li>Level of Complexity</li>
+</ul>
+<p>Spooling Directory Source<br>slurper</p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ul>
+<li><a href="https://www.manning.com/books/hadoop-in-action-second-edition" target="_blank" rel="external">Hadoop in Action</a></li>
+<li><a href="http://shop.oreilly.com/product/0636920033196.do" target="_blank" rel="external">Hadoop Application Architectures</a></li>
+<li><a href="http://www.slideshare.net/StampedeCon/choosing-an-hdfs-data-storage-format-avro-vs-parquet-and-more-stampedecon-2015" target="_blank" rel="external">Choosing an HDFS data storage format</a></li>
+<li><a href="https://www.linkedin.com/pulse/100-open-source-big-data-architecture-papers-anil-madan" target="_blank" rel="external">100 open source Big Data architecture papers for data professionals</a></li>
+</ul>
+</div></article></div></section><footer><div class="paginator"><a href="/2016/Spring-test-dbunit/" class="prev">PREV</a><a href="/2016/hive自定义文件读取/" class="next">NEXT</a></div><div class="copyright"><p>© 2015 - 2016 <a href="http://michaelhuang.github.io">huangzhf</a>, <a href="https://github.com/pinggod/hexo-theme-apollo">apollo</a>, <a href="http://hexo.io">hexo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.6.1/MathJax.js?config=TeX-MML-AM_CHTML"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-75326623-1",'auto');ga('send','pageview');</script></body></html>
