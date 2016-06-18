@@ -2,6 +2,20 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://michaelhuang.github.io/2016/Hadoop-learning-notes-Data-Ingestion/</loc>
+    
+    <lastmod>2016-06-18T16:39:31.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://michaelhuang.github.io/2016/Hive-hdfs-file-slurper%E8%BF%9B%E8%A1%8C%E7%AE%80%E5%8D%95%E6%96%87%E6%9C%AC%E9%A2%84%E5%A4%84%E7%90%86/</loc>
+    
+    <lastmod>2016-06-18T16:35:59.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://michaelhuang.github.io/2015/Vagrant-Puppet-Testing-Hadoop/</loc>
     
     <lastmod>2016-06-06T15:43:56.000Z</lastmod>
@@ -12,13 +26,6 @@
     <loc>http://michaelhuang.github.io/2016/MIT%E7%BA%BF%E4%BB%A3%E7%AC%94%E8%AE%B0/</loc>
     
     <lastmod>2016-06-06T15:14:55.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://michaelhuang.github.io/2016/Hive-hdfs-file-slurper%E8%BF%9B%E8%A1%8C%E7%AE%80%E5%8D%95%E6%96%87%E6%9C%AC%E9%A2%84%E5%A4%84%E7%90%86/</loc>
-    
-    <lastmod>2016-06-05T16:03:24.000Z</lastmod>
     
   </url>
   

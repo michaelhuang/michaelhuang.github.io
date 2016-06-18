@@ -98,20 +98,23 @@
   </entry>
   
   <entry>
-    <title>Hive + Hdfs-File-Slurper进行简单文本预处理</title>
-    <link href="http://michaelhuang.github.io/2016/Hive-hdfs-file-slurper%E8%BF%9B%E8%A1%8C%E7%AE%80%E5%8D%95%E6%96%87%E6%9C%AC%E9%A2%84%E5%A4%84%E7%90%86/"/>
-    <id>http://michaelhuang.github.io/2016/Hive-hdfs-file-slurper进行简单文本预处理/</id>
-    <published>2016-04-04T14:04:51.000Z</published>
-    <updated>2016-06-05T16:03:24.000Z</updated>
+    <title>Hadoop Learning Notes: Data Ingestion</title>
+    <link href="http://michaelhuang.github.io/2016/Hadoop-learning-notes-Data-Ingestion/"/>
+    <id>http://michaelhuang.github.io/2016/Hadoop-learning-notes-Data-Ingestion/</id>
+    <published>2016-04-14T16:38:02.000Z</published>
+    <updated>2016-06-18T16:39:31.000Z</updated>
     
-    <content type="html">&lt;blockquote&gt;
-&lt;p&gt;应用场景：每天固定时间，会有海量的文本文件，文本数据是以增量形式提供，现在需要每天都能获得全量的保存有最新记录的数据&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;
-&lt;p&gt;这算是一个典型的简单ETL过程，先来看看利用hadoop生态圈，data ingestion选型的时候需要考虑哪些因素&lt;/p&gt;
-&lt;h2 id=&quot;Data-Ingestion-Considerations&quot;&gt;&lt;a href=&quot;#Data-Ingestion-Considerations&quot; class=&quot;headerlink&quot; title=&quot;Data Ingestion Considerations&quot;&gt;&lt;/a&gt;Data Ingestion Considerations&lt;/h2&gt;&lt;ul&gt;
-&lt;li&gt;Timeliness of data ingestion and accessibility&lt;br&gt;数据导入频率什么级别，需要多久能供下游使用？&lt;/li&gt;
+    <content type="html">&lt;p&gt;数据导入的时候需要考虑哪些因素? &lt;code&gt;No Silver Bullet.&lt;/code&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;什么数据类型？数据格式是否和已用的查询处理工具兼容？&lt;/li&gt;
+&lt;li&gt;预估文件大小如何？是否均匀分布？会不会有大量的小文件？&lt;/li&gt;
+&lt;li&gt;schema是否要频繁变更？&lt;/li&gt;
+&lt;li&gt;查询的时候倾向于就那么几列，还是所有列？&lt;/li&gt;
+&lt;li&gt;数据导入速度要求，及下游使用（比如查询）可容忍程度如何？&lt;/li&gt;
+&lt;li&gt;集群平台自建？还是别的厂商？&lt;br&gt;…&lt;/li&gt;
 &lt;/ul&gt;
+&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;
+&lt;h2 id=&quot;Data-Ingestion-Considerations&quot;&gt;&lt;a href=&quot;#Data-Ingestion-Considerations&quot; class=&quot;headerlink&quot; title=&quot;Data Ingestion Considerations&quot;&gt;&lt;/a&gt;Data Ingestion Considerations&lt;/h2&gt;&lt;h6 id=&quot;Timeliness-of-data-ingestion-and-accessibility&quot;&gt;&lt;a href=&quot;#Timeliness-of-data-ingestion-and-accessibility&quot; class=&quot;headerlink&quot; title=&quot;Timeliness of data ingestion and accessibility&quot;&gt;&lt;/a&gt;Timeliness of data ingestion and accessibility&lt;/h6&gt;&lt;p&gt;数据导入频率什么级别，需要多久能供下游使用？&lt;/p&gt;
 &lt;table&gt;
 &lt;thead&gt;
 &lt;tr&gt;
@@ -138,13 +141,13 @@
 &lt;td&gt;Near-Real-Time Decision Support&lt;/td&gt;
 &lt;td&gt;&amp;gt;     2 seconds&lt;/td&gt;
 &lt;td&gt;Flume, Kafka&lt;/td&gt;
-&lt;td&gt;HBase, Solr&lt;/td&gt;
+&lt;td&gt;HBase, Elasticsearch&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;Near-Real-Time Event Processing&lt;/td&gt;
 &lt;td&gt;&amp;gt;   100 milliseconds&lt;/td&gt;
 &lt;td&gt;Flume, Kafka&lt;/td&gt;
-&lt;td&gt;HBase, Solr&lt;/td&gt;
+&lt;td&gt;HBase, Elasticsearch&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;Real Time&lt;/td&gt;
@@ -154,110 +157,159 @@
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;ul&gt;
-&lt;li&gt;Storage format&lt;br&gt;存储格式主要这几种，纯文本，Hadoop原生的Sequence File，序列化Avro，列存储Parquet和ORC(optimized RCFile)&lt;/li&gt;
-&lt;/ul&gt;
+&lt;h6 id=&quot;Storage-format&quot;&gt;&lt;a href=&quot;#Storage-format&quot; class=&quot;headerlink&quot; title=&quot;Storage format&quot;&gt;&lt;/a&gt;Storage format&lt;/h6&gt;&lt;p&gt;存储格式主要这几种，纯文本，Hadoop原生的Sequence File，序列化Avro，列存储Parquet和ORC(optimized RCFile)&lt;/p&gt;
 &lt;table&gt;
 &lt;thead&gt;
 &lt;tr&gt;
 &lt;th&gt;format&lt;/th&gt;
+&lt;th&gt;size&lt;/th&gt;
 &lt;th&gt;read&lt;/th&gt;
 &lt;th&gt;write&lt;/th&gt;
-&lt;th&gt;schema evolution&lt;/th&gt;
-&lt;th&gt;compression&lt;/th&gt;
+&lt;th&gt;feature&lt;/th&gt;
 &lt;/tr&gt;
 &lt;/thead&gt;
 &lt;tbody&gt;
 &lt;tr&gt;
 &lt;td&gt;Text&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;+++++&lt;/td&gt;
+&lt;td&gt;+&lt;/td&gt;
+&lt;td&gt;+++++&lt;/td&gt;
+&lt;td&gt;convenient format, human readable&lt;br&gt;not support block compression&lt;br&gt;Store is bulky and not as efficient to query&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;Sequence File&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;+++&lt;/td&gt;
+&lt;td&gt;++&lt;/td&gt;
+&lt;td&gt;+++&lt;/td&gt;
+&lt;td&gt;Is row oriented format&lt;br&gt;Supports splitting even if the data is compressed&lt;br&gt;Can be used to pack small files in hadoop&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;Avro&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;++&lt;/td&gt;
+&lt;td&gt;+++&lt;/td&gt;
+&lt;td&gt;++&lt;/td&gt;
+&lt;td&gt;Is row oriented binary format&lt;br&gt;Better schema evolution&lt;br&gt;Self-describing and language-independent schema(JSON), the file contain the schema in addition to the data&lt;br&gt;Support block compression and are splittable&lt;br&gt;Compact and fast binary format, widely used as a serialization platform&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;Parquet&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;+&lt;/td&gt;
+&lt;td&gt;+++++&lt;/td&gt;
+&lt;td&gt;+&lt;/td&gt;
+&lt;td&gt;Is column oriented binary format&lt;br&gt;Slow in writing but fast in reading&lt;br&gt;Optimized and efficient in terms of disk I/O when specific columns need to be queried&lt;br&gt;Supports compression&lt;br&gt;Support limited schema evolution, new columns can be added at the end of the structure&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;ORC&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;+&lt;/td&gt;
+&lt;td&gt;+++++&lt;/td&gt;
+&lt;td&gt;+&lt;/td&gt;
+&lt;td&gt;like Parquet, but designed specifically for Hive, not a general-purpose storage format&lt;br&gt;Not support schema evolution&lt;/td&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
+&lt;p&gt;频繁变更的，比如schema、查询结果字段集，Avro更合适；如果查询结果集字段很固定，对写入速度没有要求，Parquet更合适；只想快速导入到HDFS，Text无疑是最快的，但是通常情况下没有人会这样做，比如xml，not splittable，意味着不能并行处理，再就是很耗磁盘网络IO，通常都要压缩，但是又不支持block compression(压缩后not splittable)；ORC是HortonWorks开发的，厂商竞争导致Cloudera Impala用不了，所以Cloudera和twitter一起搞出个Parquet；SequenceFiles类似于csv，但是支持block compression，通常作为MapReduce jobs的过程存储；&lt;/p&gt;
+&lt;p&gt;格式的选择没那么绝对，选了这个，就不能选那个了，通常都会配合使用，比如processing阶段使用SequenceFiles，query阶段使用Parquet，extract可能选择csv(方便导入数据库)&lt;/p&gt;
+&lt;h6 id=&quot;Codecs&quot;&gt;&lt;a href=&quot;#Codecs&quot; class=&quot;headerlink&quot; title=&quot;Codecs&quot;&gt;&lt;/a&gt;Codecs&lt;/h6&gt;&lt;p&gt;压缩格式如何选择？&lt;/p&gt;
 &lt;table&gt;
 &lt;thead&gt;
 &lt;tr&gt;
-&lt;th&gt;compression&lt;/th&gt;
+&lt;th&gt;codecs&lt;/th&gt;
 &lt;th&gt;size&lt;/th&gt;
-&lt;th&gt;speed&lt;/th&gt;
+&lt;th&gt;compression speed&lt;/th&gt;
+&lt;th&gt;decompression speed&lt;/th&gt;
 &lt;th&gt;splittable&lt;/th&gt;
 &lt;/tr&gt;
 &lt;/thead&gt;
 &lt;tbody&gt;
 &lt;tr&gt;
 &lt;td&gt;Snappy&lt;/td&gt;
-&lt;td&gt;good trade-off&lt;/td&gt;
-&lt;td&gt;good trade-off&lt;/td&gt;
+&lt;td&gt;+++++&lt;/td&gt;
+&lt;td&gt;++++&lt;/td&gt;
+&lt;td&gt;++++++&lt;/td&gt;
 &lt;td&gt;not inherently splittable, need a container format like SequenceFiles or Avro&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;LZO&lt;/td&gt;
-&lt;td&gt;normal&lt;/td&gt;
-&lt;td&gt;optimized&lt;/td&gt;
+&lt;td&gt;++++&lt;/td&gt;
+&lt;td&gt;++++&lt;/td&gt;
+&lt;td&gt;+++++&lt;/td&gt;
 &lt;td&gt;splittable, requires an additional indexing step&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;Gzip&lt;/td&gt;
-&lt;td&gt;2.5 times compression that’d be offered by Snappy&lt;/td&gt;
-&lt;td&gt;write half of Snappy&lt;br&gt;read as well as Snappy&lt;/td&gt;
+&lt;td&gt;++&lt;/td&gt;
+&lt;td&gt;++&lt;/td&gt;
+&lt;td&gt;+++&lt;/td&gt;
 &lt;td&gt;not inherently splittable, need a container format like SequenceFiles or Avro&lt;br&gt;using smaller blocks can lead to better performance&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;bzip2&lt;/td&gt;
-&lt;td&gt;9% better than GZip&lt;/td&gt;
-&lt;td&gt;10 times slower than GZip&lt;/td&gt;
+&lt;td&gt;+&lt;/td&gt;
+&lt;td&gt;+&lt;/td&gt;
+&lt;td&gt;++&lt;/td&gt;
 &lt;td&gt;inherently splittable&lt;/td&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;p&gt;从表中可以看出，大多数情况使用Snappy即可；如果是纯文本则使用LZO会更好一些；如果对写速度没啥要求，可以使用Gzip；如果对读写都没啥要求，那不如bzip2了&lt;/p&gt;
+&lt;p&gt;从表中可以看出，大多数情况hot data使用Snappy即可，如果是纯文本则使用LZO会更方便一些；cold data建议Gzip；追求更高的压缩比建议bzip2&lt;/p&gt;
+&lt;h6 id=&quot;Incremental-updates&quot;&gt;&lt;a href=&quot;#Incremental-updates&quot; class=&quot;headerlink&quot; title=&quot;Incremental updates&quot;&gt;&lt;/a&gt;Incremental updates&lt;/h6&gt;&lt;p&gt;新数据以什么形式落地？append or need modifying existing data?&lt;br&gt;只是append，那直接灌到HDFS即可；如果需要merge，对于HDFS来说，需要一个Compact job，对增量数据和现有数据做merge，比如用Hive的left join&lt;/p&gt;
+&lt;h6 id=&quot;Data-access-pattern&quot;&gt;&lt;a href=&quot;#Data-access-pattern&quot; class=&quot;headerlink&quot; title=&quot;Data access pattern&quot;&gt;&lt;/a&gt;Data access pattern&lt;/h6&gt;&lt;p&gt;batch processing jobs? Or is random access?&lt;br&gt;如果是大量的扫描批处理，那HDFS更合适；如果是随机的访问数据，那NoSQL(比如Hbase)更合适&lt;/p&gt;
+&lt;h6 id=&quot;Source-system-and-data-structure&quot;&gt;&lt;a href=&quot;#Source-system-and-data-structure&quot; class=&quot;headerlink&quot; title=&quot;Source system and data structure&quot;&gt;&lt;/a&gt;Source system and data structure&lt;/h6&gt;&lt;p&gt;数据源类型：RDBMS or Logs？数据类型：structured、semistructured or unstructured?&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;Incremental updates&lt;br&gt;新数据以什么形式落地？append or overwrite?&lt;/li&gt;
-&lt;li&gt;Data access pattern&lt;br&gt;Will the data be used in processing? If so, will it be used in batch processing jobs? Or is random access to the data required?&lt;/li&gt;
-&lt;li&gt;Source system and data structure&lt;br&gt;数据源类型：RDBMS or Logs？数据类型：structured、semistructured or unstructured?&lt;/li&gt;
-&lt;li&gt;Transformations, Partitioning and splitting&lt;br&gt;如何规划分区？数据需要导入到多个目标系统（HDFS, HBase）?&lt;/li&gt;
-&lt;li&gt;Network Bottlenecks&lt;/li&gt;
-&lt;li&gt;Network Security&lt;/li&gt;
-&lt;li&gt;Failure Handling&lt;/li&gt;
-&lt;li&gt;Level of Complexity&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/alexholmes/hdfs-file-slurper&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;hdfs-file-slurper&lt;/a&gt;&lt;br&gt;轻量级传输工具，多并发，单机多实例，简单容错处理，LZO压缩，定制脚本等&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://sqoop.apache.org/docs/1.99.1/index.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Sqoop&lt;/a&gt;&lt;br&gt;Hadoop和RDBMS间批量传输利器&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;http://flume.apache.org/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Flume&lt;/a&gt;&lt;br&gt;日志收集利器&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;http://kafka.apache.org/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Kafka&lt;/a&gt;和&lt;a href=&quot;https://www.elastic.co/products/logstash&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;logstash&lt;/a&gt;&lt;br&gt;再加上Elasticsearch, elk日志收集黄金搭档！&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;Spooling Directory Source&lt;br&gt;slurper&lt;/p&gt;
+&lt;h6 id=&quot;Network-Bottlenecks&quot;&gt;&lt;a href=&quot;#Network-Bottlenecks&quot; class=&quot;headerlink&quot; title=&quot;Network Bottlenecks&quot;&gt;&lt;/a&gt;Network Bottlenecks&lt;/h6&gt;&lt;p&gt;做好监控，网卡瓶颈，传输数据压缩&lt;/p&gt;
+&lt;h6 id=&quot;Network-Security&quot;&gt;&lt;a href=&quot;#Network-Security&quot; class=&quot;headerlink&quot; title=&quot;Network Security&quot;&gt;&lt;/a&gt;Network Security&lt;/h6&gt;&lt;p&gt;数据脱敏，加密解密；如果用Flume，agents之间传输数据支持加密的；用Kafka就需要额外的处理过程&lt;/p&gt;
+&lt;h6 id=&quot;Failure-Handling&quot;&gt;&lt;a href=&quot;#Failure-Handling&quot; class=&quot;headerlink&quot; title=&quot;Failure Handling&quot;&gt;&lt;/a&gt;Failure Handling&lt;/h6&gt;&lt;p&gt;容错机制：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;传输10个文件，如果有一个失败了，能否知道是哪个，这样重传的时候只需要传这个失败的就行了&lt;/li&gt;
+&lt;li&gt;用dfs put传输一个10G大小的文件，传完9G时断了，就得重头来&lt;/li&gt;
+&lt;li&gt;走队列传，可能会导致一条记录duplicate，接收端需要去重&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h6 id=&quot;Level-of-Complexity&quot;&gt;&lt;a href=&quot;#Level-of-Complexity&quot; class=&quot;headerlink&quot; title=&quot;Level of Complexity&quot;&gt;&lt;/a&gt;Level of Complexity&lt;/h6&gt;&lt;p&gt;复杂程度：不要把问题过于复杂化；比如说就是想简单传几个文件上去，就没必要非得搞个Flume或者Kafka集群，直接fs put不就行了；&lt;/p&gt;
+&lt;p&gt;好的设计不是大而全，而是简而美；不要总想还能加什么，而是可以砍掉什么&lt;/p&gt;
 &lt;h2 id=&quot;Reference&quot;&gt;&lt;a href=&quot;#Reference&quot; class=&quot;headerlink&quot; title=&quot;Reference&quot;&gt;&lt;/a&gt;Reference&lt;/h2&gt;&lt;ul&gt;
 &lt;li&gt;&lt;a href=&quot;https://www.manning.com/books/hadoop-in-action-second-edition&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Hadoop in Action&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&quot;http://shop.oreilly.com/product/0636920033196.do&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Hadoop Application Architectures&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;http://shop.oreilly.com/product/0636920033448.do&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Hadoop: The Definitive Guide&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&quot;http://www.slideshare.net/StampedeCon/choosing-an-hdfs-data-storage-format-avro-vs-parquet-and-more-stampedecon-2015&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Choosing an HDFS data storage format&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;http://www.inquidia.com/news-and-info/hadoop-file-formats-its-not-just-csv-anymore&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Hadoop File Formats: It’s not just CSV anymore&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&quot;https://www.linkedin.com/pulse/100-open-source-big-data-architecture-papers-anil-madan&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;100 open source Big Data architecture papers for data professionals&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/ning/jvm-compressor-benchmark/wiki&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;jvm compressor benchmark&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;数据导入的时候需要考虑哪些因素? &lt;code&gt;No Silver Bullet.&lt;/code&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;什么数据类型？数据格式是否和已用的查询处理工具兼容？&lt;/li&gt;
+&lt;li&gt;预估文件大小如何？是否均匀分布？会不会有大量的小文件？&lt;/li&gt;
+&lt;li&gt;schema是否要频繁变更？&lt;/li&gt;
+&lt;li&gt;查询的时候倾向于就那么几列，还是所有列？&lt;/li&gt;
+&lt;li&gt;数据导入速度要求，及下游使用（比如查询）可容忍程度如何？&lt;/li&gt;
+&lt;li&gt;集群平台自建？还是别的厂商？&lt;br&gt;…&lt;/li&gt;
+&lt;/ul&gt;
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Hive + Hdfs-File-Slurper进行简单文本预处理</title>
+    <link href="http://michaelhuang.github.io/2016/Hive-hdfs-file-slurper%E8%BF%9B%E8%A1%8C%E7%AE%80%E5%8D%95%E6%96%87%E6%9C%AC%E9%A2%84%E5%A4%84%E7%90%86/"/>
+    <id>http://michaelhuang.github.io/2016/Hive-hdfs-file-slurper进行简单文本预处理/</id>
+    <published>2016-04-04T14:04:51.000Z</published>
+    <updated>2016-06-18T16:35:59.000Z</updated>
+    
+    <content type="html">&lt;blockquote&gt;
+&lt;p&gt;应用场景：每天固定时间，会有海量的文本文件，文本数据是以增量形式提供，现在需要每天都能获得全量的保存有最新记录的数据&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;
+&lt;p&gt;&lt;em&gt;待续…&lt;/em&gt;&lt;/p&gt;
 </content>
     
     <summary type="html">
