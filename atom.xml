@@ -386,31 +386,6 @@
   </entry>
   
   <entry>
-    <title>Hive + Hdfs-File-Slurper进行简单文本预处理</title>
-    <link href="http://michaelhuang.github.io/2016/Hive-hdfs-file-slurper%E8%BF%9B%E8%A1%8C%E7%AE%80%E5%8D%95%E6%96%87%E6%9C%AC%E9%A2%84%E5%A4%84%E7%90%86/"/>
-    <id>http://michaelhuang.github.io/2016/Hive-hdfs-file-slurper进行简单文本预处理/</id>
-    <published>2016-04-04T14:04:51.000Z</published>
-    <updated>2016-06-18T16:35:59.000Z</updated>
-    
-    <content type="html">&lt;blockquote&gt;
-&lt;p&gt;应用场景：每天固定时间，会有海量的文本文件，文本数据是以增量形式提供，现在需要每天都能获得全量的保存有最新记录的数据&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;
-&lt;p&gt;&lt;em&gt;待续…&lt;/em&gt;&lt;/p&gt;
-</content>
-    
-    <summary type="html">
-    
-      &lt;blockquote&gt;
-&lt;p&gt;应用场景：每天固定时间，会有海量的文本文件，文本数据是以增量形式提供，现在需要每天都能获得全量的保存有最新记录的数据&lt;/p&gt;
-&lt;/blockquote&gt;
-    
-    </summary>
-    
-    
-  </entry>
-  
-  <entry>
     <title>Hive自定义文件读取</title>
     <link href="http://michaelhuang.github.io/2016/hive%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96/"/>
     <id>http://michaelhuang.github.io/2016/hive自定义文件读取/</id>
