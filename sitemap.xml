@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://michaelhuang.github.io/2016/Functional-Programming-Principles-in-Scala/</loc>
+    
+    <lastmod>2016-06-26T14:23:16.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://michaelhuang.github.io/2016/ssh-local-forwarding/</loc>
     
     <lastmod>2016-06-20T13:25:19.000Z</lastmod>
