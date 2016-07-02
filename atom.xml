@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://michaelhuang.github.io/"/>
-  <updated>2016-06-26T14:23:16.000Z</updated>
+  <updated>2016-07-02T14:42:48.000Z</updated>
   <id>http://michaelhuang.github.io/</id>
   
   <author>
@@ -16,14 +16,28 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>Functional Programming Principles in Scala</title>
+    <title>Principles in Scala(一)</title>
     <link href="http://michaelhuang.github.io/2016/Functional-Programming-Principles-in-Scala/"/>
     <id>http://michaelhuang.github.io/2016/Functional-Programming-Principles-in-Scala/</id>
     <published>2016-06-26T08:08:50.000Z</published>
-    <updated>2016-06-26T14:23:16.000Z</updated>
+    <updated>2016-07-02T14:42:48.000Z</updated>
     
-    <content type="html">&lt;p&gt;&lt;a href=&quot;https://www.coursera.org/learn/progfun1&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://www.coursera.org/learn/progfun1&lt;/a&gt;&lt;br&gt;该课程更像是Scala版本的SICP&lt;br&gt;MOOC notes&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;h2 id=&quot;WEEK-1&quot;&gt;&lt;a href=&quot;#WEEK-1&quot; class=&quot;headerlink&quot; title=&quot;WEEK 1&quot;&gt;&lt;/a&gt;WEEK 1&lt;/h2&gt;&lt;h4 id=&quot;Evaluation-Rules&quot;&gt;&lt;a href=&quot;#Evaluation-Rules&quot; class=&quot;headerlink&quot; title=&quot;Evaluation Rules&quot;&gt;&lt;/a&gt;Evaluation Rules&lt;/h4&gt;&lt;ul&gt;
+    <content type="html">&lt;p&gt;&lt;a href=&quot;https://www.coursera.org/learn/progfun1&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://www.coursera.org/learn/progfun1&lt;/a&gt;&lt;br&gt;该课程更像是Scala版本的SICP&lt;/p&gt;
+&lt;p&gt;WEEK 1 notes:&lt;br&gt;这周主要是sbt、idea插件等环境准备，然后通过几个案例简单介绍下Scala的语法&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;环境准备: jdk1.8, sbt0.13.x&lt;/li&gt;
+&lt;li&gt;Evaluation Rules: call by value, call by name&lt;/li&gt;
+&lt;li&gt;牛顿迭代求平方根&lt;/li&gt;
+&lt;li&gt;尾递归&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&quot;Prepare&quot;&gt;&lt;a href=&quot;#Prepare&quot; class=&quot;headerlink&quot; title=&quot;Prepare&quot;&gt;&lt;/a&gt;Prepare&lt;/h4&gt;&lt;figure class=&quot;highlight bash&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;6&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;7&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;8&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;9&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;10&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;11&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;12&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;13&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;14&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;15&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;$ brew install sbt&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;# 国内repo&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;$ cat ~/.sbt/repositories&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;[repositories]&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;built_in&quot;&gt;local&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;osc: http://maven.oschina.net/content/groups/public/&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;typesafe: http://repo.typesafe.com/typesafe/ivy-releases/, [organization]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[&lt;span class=&quot;built_in&quot;&gt;type&lt;/span&gt;]s/[artifact](-[classifier]).[ext], bootOnly&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;sonatype-oss-releases&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;maven-central&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;sonatype-oss-snapshots&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;# idea插件, 使用：cd 工程目录 &amp;amp;&amp;amp; run `sbt gen-idea` &amp;amp;&amp;amp; import project in idea&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;$ cat ~/.sbt/0.13/plugins/build.sbt&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;addSbtPlugin(&lt;span class=&quot;string&quot;&gt;&quot;com.github.mpeltonen&quot;&lt;/span&gt; % &lt;span class=&quot;string&quot;&gt;&quot;sbt-idea&quot;&lt;/span&gt; % &lt;span class=&quot;string&quot;&gt;&quot;1.6.0&quot;&lt;/span&gt;)&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;http://www.scala-sbt.org/release/docs/Setup.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;sbt setup&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/mpeltonen/sbt-idea&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;sbt idea&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://plugins.jetbrains.com/plugin/?idea&amp;amp;id=1347&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;scala idea&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&quot;Evaluation-Rules&quot;&gt;&lt;a href=&quot;#Evaluation-Rules&quot; class=&quot;headerlink&quot; title=&quot;Evaluation Rules&quot;&gt;&lt;/a&gt;Evaluation Rules&lt;/h4&gt;&lt;ul&gt;
 &lt;li&gt;Call by value: evaluates the function arguments before calling the function&lt;/li&gt;
 &lt;li&gt;Call by name: evaluates the function first, and then evaluates the arguments if need be&lt;/li&gt;
 &lt;/ul&gt;
@@ -62,7 +76,13 @@
     
     <summary type="html">
     
-      &lt;p&gt;&lt;a href=&quot;https://www.coursera.org/learn/progfun1&quot;&gt;https://www.coursera.org/learn/progfun1&lt;/a&gt;&lt;br&gt;该课程更像是Scala版本的SICP&lt;br&gt;MOOC notes&lt;br&gt;
+      &lt;p&gt;&lt;a href=&quot;https://www.coursera.org/learn/progfun1&quot;&gt;https://www.coursera.org/learn/progfun1&lt;/a&gt;&lt;br&gt;该课程更像是Scala版本的SICP&lt;/p&gt;
+&lt;p&gt;WEEK 1 notes:&lt;br&gt;这周主要是sbt、idea插件等环境准备，然后通过几个案例简单介绍下Scala的语法&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;环境准备: jdk1.8, sbt0.13.x&lt;/li&gt;
+&lt;li&gt;Evaluation Rules: call by value, call by name&lt;/li&gt;
+&lt;li&gt;牛顿迭代求平方根&lt;/li&gt;
+&lt;li&gt;尾递归
     
     </summary>
     
