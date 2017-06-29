@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="description" content="Hive实现拉链存储"/>
+
+
+
+
+  <meta name="keywords" content="hive," />
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="huangzf's blog">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.4.x" />
+
+
+
+<link rel="canonical" href="http://michaelhuang.github.io/2016/04/01/hive_one/"/>
+
+
+<meta name="description" content="什么是拉链存储？数据仓库经常用到，通过给record增加两个字段: 生效日期、失效日期，来记录数据的生命周期变化；好处是既节省存储空间，又保证历史数据变化的完整性，最重要的还能快速访问不同时段的数据快照">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hive实现拉链存储">
+<meta property="og:url" content="http://michaelhuang.github.io/2016/04/01/hive_one/index.html">
+<meta property="og:site_name" content="huangzf's blog">
+<meta property="og:description" content="什么是拉链存储？数据仓库经常用到，通过给record增加两个字段: 生效日期、失效日期，来记录数据的生命周期变化；好处是既节省存储空间，又保证历史数据变化的完整性，最重要的还能快速访问不同时段的数据快照">
+<meta property="og:image" content="http://michaelhuang.qiniudn.com/hive-lalian01.png">
+<meta property="og:image" content="http://michaelhuang.qiniudn.com/hive-lalian02.png">
+<meta property="og:image" content="http://michaelhuang.qiniudn.com/hive-lalian03.png">
+<meta property="og:image" content="http://michaelhuang.qiniudn.com/hive-lalian04.png">
+<meta property="og:image" content="http://michaelhuang.qiniudn.com/hive-lalian05.png">
+<meta property="og:updated_time" content="2017-06-29T06:59:14.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Hive实现拉链存储">
+<meta name="twitter:description" content="什么是拉链存储？数据仓库经常用到，通过给record增加两个字段: 生效日期、失效日期，来记录数据的生命周期变化；好处是既节省存储空间，又保证历史数据变化的完整性，最重要的还能快速访问不同时段的数据快照">
+<meta name="twitter:image" content="http://michaelhuang.qiniudn.com/hive-lalian01.png">
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.4.x" />
+
+
+
+  <link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" />
+
+
+
+
+
+<script>
+  var CONFIG = {
+    search: false,
+    searchPath: "/search.xml",
+    fancybox: true,
+    toc: true,
+  }
+</script>
+
+
+
+
+  
+
+
+
+    <title> Hive实现拉链存储 · huangzf's blog </title>
+  </head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">huangzf's blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    
+      <a href="/">
+        <li class="mobile-menu-item">
+          
+          
+            Home
+          
+        </li>
+      </a>
+    
+      <a href="/archives/">
+        <li class="mobile-menu-item">
+          
+          
+            Archives
+          
+        </li>
+      </a>
+    
+      <a href="/tags">
+        <li class="mobile-menu-item">
+          
+          
+            Tags
+          
+        </li>
+      </a>
+    
+      <a href="/categories">
+        <li class="mobile-menu-item">
+          
+          
+            Categories
+          
+        </li>
+      </a>
+    
+      <a href="/about">
+        <li class="mobile-menu-item">
+          
+          
+            About
+          
+        </li>
+      </a>
+    
+  </ul>
+</nav>
+
+    <div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">huangzf's blog</a>
+</div>
+
+<nav class="site-navbar">
+  
+    <ul id="menu" class="menu">
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/">
+            
+            
+              Home
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/archives/">
+            
+            
+              Archives
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/tags">
+            
+            
+              Tags
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/categories">
+            
+            
+              Categories
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/about">
+            
+            
+              About
+            
+          </a>
+        </li>
+      
+      
+    </ul>
+  
+</nav>
+
+      </header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content">
+            
+  
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">
+        
+          Hive实现拉链存储
+        
+      </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          Apr 1, 2016
+        </span>
+      </div>
+    </header>
+
+    
+    
+  <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">Contents</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Hive-ODPS实现方法"><span class="toc-text">Hive/ODPS实现方法</span></a></li></ol>
+    </div>
+  </div>
+
+
+    <div class="post-content">
+      
+        <blockquote>
+<p>什么是拉链存储？数据仓库经常用到，通过给record增加两个字段: 生效日期、失效日期，来记录数据的生命周期变化；好处是既节省存储空间，又保证历史数据变化的完整性，最重要的还能快速访问不同时段的数据快照</p>
+</blockquote>
+<a id="more"></a>
+<p>那为什么叫拉链呢？因为每回新更新record进来后，都会对旧record进行闭链（更改失效日期），同时对新record开链（更改生效日期），就像链条一样，一环扣一环</p>
+<p>下面以用户数据为例：</p>
+<p><img src="http://michaelhuang.qiniudn.com/hive-lalian01.png" alt="用户基本信息"><br><img src="http://michaelhuang.qiniudn.com/hive-lalian02.png" alt="数据一生"><br><img src="http://michaelhuang.qiniudn.com/hive-lalian03.png" alt="加入拉链日期"><br><img src="http://michaelhuang.qiniudn.com/hive-lalian04.png" alt="取某天快照"><br><img src="http://michaelhuang.qiniudn.com/hive-lalian05.png" alt="取一段时间快照"></p>
+<h2 id="Hive-ODPS实现方法"><a href="#Hive-ODPS实现方法" class="headerlink" title="Hive/ODPS实现方法"></a>Hive/ODPS实现方法</h2><p>Hive两个特性：<code>only write once</code>, <code>schema on read</code><br>一般来说存储底层是HDFS（当然有可能是spark或其他，本文不考虑），所以是做不了update的，update成本都不如覆盖重写了，可以考虑利用<a href="https://cwiki.apache.org/confluence/display/Hive/LanguageManual+WindowingAndAnalytics" target="_blank" rel="external">LEAD Function</a>解决</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">        PRIMARY_KEY,</span><br><span class="line">        EFFECTIVE_DT,</span><br><span class="line">        <span class="keyword">CASE</span></span><br><span class="line">          <span class="keyword">WHEN</span> <span class="keyword">LEAD</span>(EFFECTIVE_DT,<span class="number">1</span>,<span class="literal">null</span>)</span><br><span class="line">            <span class="keyword">OVER</span></span><br><span class="line">              (<span class="keyword">PARTITION</span> <span class="keyword">BY</span> PRIMARY_KEY <span class="keyword">ORDER</span> <span class="keyword">BY</span> EFFECTIVE_DT)</span><br><span class="line">                 <span class="keyword">IS</span> <span class="literal">NULL</span> <span class="keyword">THEN</span> <span class="literal">NULL</span></span><br><span class="line">          <span class="keyword">ELSE</span> <span class="keyword">LEAD</span>(EFFECTIVE_DT,<span class="number">1</span>,<span class="literal">null</span>)</span><br><span class="line">            <span class="keyword">OVER</span></span><br><span class="line">              (<span class="keyword">PARTITION</span> <span class="keyword">BY</span> PRIMARY_KEY <span class="keyword">ORDER</span> <span class="keyword">BY</span> EFFECTIVE_DT)</span><br><span class="line">        <span class="keyword">END</span> <span class="keyword">AS</span> EXPIRED_DT,</span><br><span class="line">        EVENT_VALUE</span><br><span class="line">       <span class="keyword">FROM</span> (</span><br><span class="line">         <span class="keyword">SELECT</span></span><br><span class="line">           PRIMARY_KEY,</span><br><span class="line">           EFFECTIVE_DT,</span><br><span class="line">           EVENT_VALUE</span><br><span class="line">         <span class="keyword">FROM</span></span><br><span class="line">           EXISTING_TIME_SERIES_TABLE</span><br><span class="line">         <span class="keyword">WHERE</span></span><br><span class="line">           EXPIRED_DT <span class="keyword">IS</span> <span class="literal">NULL</span></span><br><span class="line">         <span class="keyword">UNION</span> ALL</span><br><span class="line">         <span class="keyword">SELECT</span></span><br><span class="line">           PRIMARY_KEY,</span><br><span class="line">           EFFECTIVE_DT,</span><br><span class="line">           EVENT_VALUE</span><br><span class="line">         <span class="keyword">FROM</span> NEW_TIME_SERIES_TABLE</span><br><span class="line">       ) sub_1</span><br></pre></td></tr></table></figure>
+<div class="tip"><br>该方法不具有幂等性，重复执行会导致多出<code>EFFECTIVE_DT = EXPIRED_DT</code>的数据；如果无法避免重复执行，子查询里面需要去重<br></div>
+
+
+      
+    </div>
+
+    
+      
+      
+
+
+
+      
+      
+    
+
+    
+      <footer class="post-footer">
+        
+          <div class="post-tags">
+            
+              <a href="/tags/hive/">hive</a>
+            
+          </div>
+        
+        
+        
+  <nav class="post-nav">
+    
+      <a class="prev" href="/2016/04/03/hive_two/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">Hive自定义文件读取</span>
+        <span class="prev-text nav-mobile">Prev</span>
+      </a>
+    
+    
+      <a class="next" href="/2014/05/22/hammer/">
+        <span class="next-text nav-default">锤子发布会</span>
+        <span class="prev-text nav-mobile">Next</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    
+  </nav>
+
+      </footer>
+    
+
+  </article>
+
+
+          </div>
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>  
+      </main>
+
+      <footer id="footer" class="footer">
+
+  <div class="social-links">
+    
+      
+        
+          <a href="mailto:michaelhuang12@gmail.com" class="iconfont icon-email" title="email"></a>
+        
+      
+    
+      
+    
+      
+        
+          <a href="https://twitter.com/ZhengfeiHuang" class="iconfont icon-twitter" title="twitter"></a>
+        
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        
+          <a href="https://github.com/michaelhuang" class="iconfont icon-github" title="github"></a>
+        
+      
+    
+      
+    
+      
+    
+      
+    
+    
+    
+      <a href="/atom.xml" class="iconfont icon-rss" title="rss"></a>
+    
+  </div>
+
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://hexo.io/">Hexo</a>
+  </span>
+  
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">
+    
+    &copy; 
+     
+      2015 - 
+    
+    2017
+
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">huangzf</span>
+  </span>
+</div>
+      </footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div>
+
+    
+  
+
+  
+  
+
+
+
+
+    
+  
+
+
+
+
+
+  
+    <script type="text/javascript" src="/lib/jquery/jquery-3.1.1.min.js"></script>
+  
+
+  
+    <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  
+
+  
+    <script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+  
+
+
+    <script type="text/javascript" src="/js/src/even.js?v=2.4.x"></script>
+<script type="text/javascript" src="/js/src/bootstrap.js?v=2.4.x"></script>
+
+    
+  </body>
+</html>

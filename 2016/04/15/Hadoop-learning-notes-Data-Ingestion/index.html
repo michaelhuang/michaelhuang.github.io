@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="description" content="Data Ingestion"/>
+
+
+
+
+  <meta name="keywords" content="Data Ingestion,Hadoop," />
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="huangzf's blog">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.4.x" />
+
+
+
+<link rel="canonical" href="http://michaelhuang.github.io/2016/04/15/Hadoop-learning-notes-Data-Ingestion/"/>
+
+
+<meta name="description" content="数据导入的时候需要考虑哪些因素? No Silver Bullet.
+
+什么数据类型？数据格式是否和已用的查询处理工具兼容？
+预估文件大小如何？是否均匀分布？会不会有大量的小文件？
+schema是否要频繁变更？
+查询的时候倾向于就那么几列，还是所有列？
+数据导入速度要求，及下游使用（比如查询）可容忍程度如何？
+集群平台自建？还是别的厂商？…">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Data Ingestion">
+<meta property="og:url" content="http://michaelhuang.github.io/2016/04/15/Hadoop-learning-notes-Data-Ingestion/index.html">
+<meta property="og:site_name" content="huangzf's blog">
+<meta property="og:description" content="数据导入的时候需要考虑哪些因素? No Silver Bullet.
+
+什么数据类型？数据格式是否和已用的查询处理工具兼容？
+预估文件大小如何？是否均匀分布？会不会有大量的小文件？
+schema是否要频繁变更？
+查询的时候倾向于就那么几列，还是所有列？
+数据导入速度要求，及下游使用（比如查询）可容忍程度如何？
+集群平台自建？还是别的厂商？…">
+<meta property="og:updated_time" content="2017-06-29T06:59:14.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Data Ingestion">
+<meta name="twitter:description" content="数据导入的时候需要考虑哪些因素? No Silver Bullet.
+
+什么数据类型？数据格式是否和已用的查询处理工具兼容？
+预估文件大小如何？是否均匀分布？会不会有大量的小文件？
+schema是否要频繁变更？
+查询的时候倾向于就那么几列，还是所有列？
+数据导入速度要求，及下游使用（比如查询）可容忍程度如何？
+集群平台自建？还是别的厂商？…">
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.4.x" />
+
+
+
+  <link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" />
+
+
+
+
+
+<script>
+  var CONFIG = {
+    search: false,
+    searchPath: "/search.xml",
+    fancybox: true,
+    toc: true,
+  }
+</script>
+
+
+
+
+  
+
+
+
+    <title> Data Ingestion · huangzf's blog </title>
+  </head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">huangzf's blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    
+      <a href="/">
+        <li class="mobile-menu-item">
+          
+          
+            Home
+          
+        </li>
+      </a>
+    
+      <a href="/archives/">
+        <li class="mobile-menu-item">
+          
+          
+            Archives
+          
+        </li>
+      </a>
+    
+      <a href="/tags">
+        <li class="mobile-menu-item">
+          
+          
+            Tags
+          
+        </li>
+      </a>
+    
+      <a href="/categories">
+        <li class="mobile-menu-item">
+          
+          
+            Categories
+          
+        </li>
+      </a>
+    
+      <a href="/about">
+        <li class="mobile-menu-item">
+          
+          
+            About
+          
+        </li>
+      </a>
+    
+  </ul>
+</nav>
+
+    <div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">huangzf's blog</a>
+</div>
+
+<nav class="site-navbar">
+  
+    <ul id="menu" class="menu">
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/">
+            
+            
+              Home
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/archives/">
+            
+            
+              Archives
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/tags">
+            
+            
+              Tags
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/categories">
+            
+            
+              Categories
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/about">
+            
+            
+              About
+            
+          </a>
+        </li>
+      
+      
+    </ul>
+  
+</nav>
+
+      </header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content">
+            
+  
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">
+        
+          Data Ingestion
+        
+      </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          Apr 15, 2016
+        </span>
+      </div>
+    </header>
+
+    
+    
+  <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">Contents</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Data-Ingestion-Considerations"><span class="toc-text">Data Ingestion Considerations</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#Timeliness-of-data-ingestion-and-accessibility"><span class="toc-text">Timeliness of data ingestion and accessibility</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#Storage-format"><span class="toc-text">Storage format</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#Codecs"><span class="toc-text">Codecs</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#Incremental-updates"><span class="toc-text">Incremental updates</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#Data-access-pattern"><span class="toc-text">Data access pattern</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#Source-system-and-data-structure"><span class="toc-text">Source system and data structure</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#Network-Bottlenecks"><span class="toc-text">Network Bottlenecks</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#Network-Security"><span class="toc-text">Network Security</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#Failure-Handling"><span class="toc-text">Failure Handling</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#Level-of-Complexity"><span class="toc-text">Level of Complexity</span></a></li></ol></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Reference"><span class="toc-text">Reference</span></a></li></ol></li></ol></li></ol>
+    </div>
+  </div>
+
+
+    <div class="post-content">
+      
+        <p>数据导入的时候需要考虑哪些因素? <code>No Silver Bullet.</code></p>
+<ul>
+<li>什么数据类型？数据格式是否和已用的查询处理工具兼容？</li>
+<li>预估文件大小如何？是否均匀分布？会不会有大量的小文件？</li>
+<li>schema是否要频繁变更？</li>
+<li>查询的时候倾向于就那么几列，还是所有列？</li>
+<li>数据导入速度要求，及下游使用（比如查询）可容忍程度如何？</li>
+<li>集群平台自建？还是别的厂商？<br>…</li>
+</ul>
+<a id="more"></a>
+<h2 id="Data-Ingestion-Considerations"><a href="#Data-Ingestion-Considerations" class="headerlink" title="Data Ingestion Considerations"></a>Data Ingestion Considerations</h2><h6 id="Timeliness-of-data-ingestion-and-accessibility"><a href="#Timeliness-of-data-ingestion-and-accessibility" class="headerlink" title="Timeliness of data ingestion and accessibility"></a>Timeliness of data ingestion and accessibility</h6><p>数据导入频率什么级别，需要多久能供下游使用？</p>
+<table>
+<thead>
+<tr>
+<th>classifications</th>
+<th>timeliness requirements</th>
+<th>tools</th>
+<th>storage layer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Macro batch</td>
+<td>&gt;    15 minutes</td>
+<td>Sqoop, file transfers</td>
+<td>HDFS</td>
+</tr>
+<tr>
+<td>Microbatch</td>
+<td>&gt;     2 minutes</td>
+<td>Sqoop, file transfers</td>
+<td>HDFS</td>
+</tr>
+<tr>
+<td>Near-Real-Time Decision Support</td>
+<td>&gt;     2 seconds</td>
+<td>Flume, Kafka</td>
+<td>HBase, Elasticsearch</td>
+</tr>
+<tr>
+<td>Near-Real-Time Event Processing</td>
+<td>&gt;   100 milliseconds</td>
+<td>Flume, Kafka</td>
+<td>HBase, Elasticsearch</td>
+</tr>
+<tr>
+<td>Real Time</td>
+<td></td>
+<td>custom</td>
+<td>custom</td>
+</tr>
+</tbody>
+</table>
+<h6 id="Storage-format"><a href="#Storage-format" class="headerlink" title="Storage format"></a>Storage format</h6><p>存储格式主要这几种，纯文本，Hadoop原生的Sequence File，序列化Avro，列存储Parquet和ORC(optimized RCFile)</p>
+<table>
+<thead>
+<tr>
+<th>format</th>
+<th>size</th>
+<th>read</th>
+<th>write</th>
+<th>feature</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Text</td>
+<td>+++++</td>
+<td>+</td>
+<td>+++++</td>
+<td>convenient format, human readable<br>not support block compression<br>Store is bulky and not as efficient to query</td>
+</tr>
+<tr>
+<td>Sequence File</td>
+<td>+++</td>
+<td>++</td>
+<td>+++</td>
+<td>Is row oriented format<br>Supports splitting even if the data is compressed<br>Can be used to pack small files in hadoop</td>
+</tr>
+<tr>
+<td>Avro</td>
+<td>++</td>
+<td>+++</td>
+<td>++</td>
+<td>Is row oriented binary format<br>Better schema evolution<br>Self-describing and language-independent schema(JSON), the file contain the schema in addition to the data<br>Support block compression and are splittable<br>Compact and fast binary format, widely used as a serialization platform</td>
+</tr>
+<tr>
+<td>Parquet</td>
+<td>+</td>
+<td>+++++</td>
+<td>+</td>
+<td>Is column oriented binary format<br>Slow in writing but fast in reading<br>Optimized and efficient in terms of disk I/O when specific columns need to be queried<br>Supports compression<br>Support limited schema evolution, new columns can be added at the end of the structure</td>
+</tr>
+<tr>
+<td>ORC</td>
+<td>+</td>
+<td>+++++</td>
+<td>+</td>
+<td>like Parquet, but designed specifically for Hive, not a general-purpose storage format<br>Not support schema evolution</td>
+</tr>
+</tbody>
+</table>
+<p>频繁变更的，比如schema、查询结果字段集，Avro更合适；如果查询结果集字段很固定，对写入速度没有要求，Parquet更合适；只想快速导入到HDFS，Text无疑是最快的，但是通常情况下没有人会这样做，比如xml，not splittable，意味着不能并行处理，再就是很耗磁盘网络IO，通常都要压缩，但是又不支持block compression(压缩后not splittable)；ORC是HortonWorks开发的，厂商竞争导致Cloudera Impala用不了，所以Cloudera和twitter一起搞出个Parquet；SequenceFiles类似于csv，但是支持block compression，通常作为MapReduce jobs的过程存储；</p>
+<p>格式的选择没那么绝对，选了这个，就不能选那个了，通常都会配合使用，比如processing阶段使用SequenceFiles，query阶段使用Parquet，extract可能选择csv(方便导入数据库)</p>
+<h6 id="Codecs"><a href="#Codecs" class="headerlink" title="Codecs"></a>Codecs</h6><p>压缩格式如何选择？</p>
+<table>
+<thead>
+<tr>
+<th>codecs</th>
+<th>size</th>
+<th>compression speed</th>
+<th>decompression speed</th>
+<th>splittable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Snappy</td>
+<td>+++++</td>
+<td>++++</td>
+<td>++++++</td>
+<td>not inherently splittable, need a container format like SequenceFiles or Avro</td>
+</tr>
+<tr>
+<td>LZO</td>
+<td>++++</td>
+<td>++++</td>
+<td>+++++</td>
+<td>splittable, requires an additional indexing step</td>
+</tr>
+<tr>
+<td>Gzip</td>
+<td>++</td>
+<td>++</td>
+<td>+++</td>
+<td>not inherently splittable, need a container format like SequenceFiles or Avro<br>using smaller blocks can lead to better performance</td>
+</tr>
+<tr>
+<td>bzip2</td>
+<td>+</td>
+<td>+</td>
+<td>++</td>
+<td>inherently splittable</td>
+</tr>
+</tbody>
+</table>
+<p>从表中可以看出，大多数情况hot data使用Snappy即可，如果是纯文本则使用LZO会更方便一些；cold data建议Gzip；追求更高的压缩比建议bzip2</p>
+<h6 id="Incremental-updates"><a href="#Incremental-updates" class="headerlink" title="Incremental updates"></a>Incremental updates</h6><p>新数据以什么形式落地？append or need modifying existing data?<br>只是append，那直接灌到HDFS即可；如果需要merge，对于HDFS来说，需要一个Compact job，对增量数据和现有数据做merge，比如用Hive的left join</p>
+<h6 id="Data-access-pattern"><a href="#Data-access-pattern" class="headerlink" title="Data access pattern"></a>Data access pattern</h6><p>batch processing jobs? Or is random access?<br>如果是大量的扫描批处理，那HDFS更合适；如果是随机的访问数据，那NoSQL(比如Hbase)更合适</p>
+<h6 id="Source-system-and-data-structure"><a href="#Source-system-and-data-structure" class="headerlink" title="Source system and data structure"></a>Source system and data structure</h6><p>数据源类型：RDBMS or Logs？数据类型：structured、semistructured or unstructured?</p>
+<ul>
+<li><a href="https://github.com/alexholmes/hdfs-file-slurper" target="_blank" rel="external">hdfs-file-slurper</a><br>轻量级传输工具，多并发，单机多实例，简单容错处理，LZO压缩，定制脚本等</li>
+<li><a href="https://sqoop.apache.org/docs/1.99.1/index.html" target="_blank" rel="external">Sqoop</a><br>Hadoop和RDBMS间批量传输利器</li>
+<li><a href="http://flume.apache.org/" target="_blank" rel="external">Flume</a><br>日志收集利器</li>
+<li><a href="http://kafka.apache.org/" target="_blank" rel="external">Kafka</a>和<a href="https://www.elastic.co/products/logstash" target="_blank" rel="external">logstash</a><br>再加上Elasticsearch, elk日志收集黄金搭档！</li>
+</ul>
+<h6 id="Network-Bottlenecks"><a href="#Network-Bottlenecks" class="headerlink" title="Network Bottlenecks"></a>Network Bottlenecks</h6><p>做好监控，网卡瓶颈，传输数据压缩</p>
+<h6 id="Network-Security"><a href="#Network-Security" class="headerlink" title="Network Security"></a>Network Security</h6><p>数据脱敏，加密解密；如果用Flume，agents之间传输数据支持加密的；用Kafka就需要额外的处理过程</p>
+<h6 id="Failure-Handling"><a href="#Failure-Handling" class="headerlink" title="Failure Handling"></a>Failure Handling</h6><p>容错机制：</p>
+<ul>
+<li>传输10个文件，如果有一个失败了，能否知道是哪个，这样重传的时候只需要传这个失败的就行了</li>
+<li>用dfs put传输一个10G大小的文件，传完9G时断了，就得重头来</li>
+<li>走队列传，可能会导致一条记录duplicate，接收端需要去重</li>
+</ul>
+<h6 id="Level-of-Complexity"><a href="#Level-of-Complexity" class="headerlink" title="Level of Complexity"></a>Level of Complexity</h6><p>复杂程度：不要把问题过于复杂化；比如说就是想简单传几个文件上去，就没必要非得搞个Flume或者Kafka集群，直接fs put不就行了；</p>
+<p>好的设计不是大而全，而是简而美；不要总想还能加什么，而是可以砍掉什么</p>
+<h4 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h4><ul>
+<li><a href="https://www.manning.com/books/hadoop-in-action-second-edition" target="_blank" rel="external">Hadoop in Action</a></li>
+<li><a href="http://shop.oreilly.com/product/0636920033196.do" target="_blank" rel="external">Hadoop Application Architectures</a></li>
+<li><a href="http://shop.oreilly.com/product/0636920033448.do" target="_blank" rel="external">Hadoop: The Definitive Guide</a></li>
+<li><a href="http://www.slideshare.net/StampedeCon/choosing-an-hdfs-data-storage-format-avro-vs-parquet-and-more-stampedecon-2015" target="_blank" rel="external">Choosing an HDFS data storage format</a></li>
+<li><a href="http://www.inquidia.com/news-and-info/hadoop-file-formats-its-not-just-csv-anymore" target="_blank" rel="external">Hadoop File Formats: It’s not just CSV anymore</a></li>
+<li><a href="https://www.linkedin.com/pulse/100-open-source-big-data-architecture-papers-anil-madan" target="_blank" rel="external">100 open source Big Data architecture papers for data professionals</a></li>
+<li><a href="https://github.com/ning/jvm-compressor-benchmark/wiki" target="_blank" rel="external">jvm compressor benchmark</a></li>
+</ul>
+
+      
+    </div>
+
+    
+      
+      
+
+
+
+      
+      
+    
+
+    
+      <footer class="post-footer">
+        
+          <div class="post-tags">
+            
+              <a href="/tags/Data-Ingestion/">Data Ingestion</a>
+            
+              <a href="/tags/Hadoop/">Hadoop</a>
+            
+          </div>
+        
+        
+        
+  <nav class="post-nav">
+    
+      <a class="prev" href="/2016/04/20/Spring-test-dbunit/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">Spring test dbunit</span>
+        <span class="prev-text nav-mobile">Prev</span>
+      </a>
+    
+    
+      <a class="next" href="/2016/04/03/hive_two/">
+        <span class="next-text nav-default">Hive自定义文件读取</span>
+        <span class="prev-text nav-mobile">Next</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    
+  </nav>
+
+      </footer>
+    
+
+  </article>
+
+
+          </div>
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>  
+      </main>
+
+      <footer id="footer" class="footer">
+
+  <div class="social-links">
+    
+      
+        
+          <a href="mailto:michaelhuang12@gmail.com" class="iconfont icon-email" title="email"></a>
+        
+      
+    
+      
+    
+      
+        
+          <a href="https://twitter.com/ZhengfeiHuang" class="iconfont icon-twitter" title="twitter"></a>
+        
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        
+          <a href="https://github.com/michaelhuang" class="iconfont icon-github" title="github"></a>
+        
+      
+    
+      
+    
+      
+    
+      
+    
+    
+    
+      <a href="/atom.xml" class="iconfont icon-rss" title="rss"></a>
+    
+  </div>
+
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://hexo.io/">Hexo</a>
+  </span>
+  
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">
+    
+    &copy; 
+     
+      2015 - 
+    
+    2017
+
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">huangzf</span>
+  </span>
+</div>
+      </footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div>
+
+    
+  
+
+  
+  
+
+
+
+
+    
+  
+
+
+
+
+
+  
+    <script type="text/javascript" src="/lib/jquery/jquery-3.1.1.min.js"></script>
+  
+
+  
+    <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  
+
+  
+    <script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+  
+
+
+    <script type="text/javascript" src="/js/src/even.js?v=2.4.x"></script>
+<script type="text/javascript" src="/js/src/bootstrap.js?v=2.4.x"></script>
+
+    
+  </body>
+</html>

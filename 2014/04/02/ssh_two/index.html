@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="description" content="好玩的ssh"/>
+
+
+
+
+  <meta name="keywords" content="ssh," />
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="huangzf's blog">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.4.x" />
+
+
+
+<link rel="canonical" href="http://michaelhuang.github.io/2014/04/02/ssh_two/"/>
+
+
+<meta name="description" content="# git push 总特么timeout咋整# 这个命令是用来调试用的，用来挖地址挺不错的, 我就挖到一个ssh -vT git@github.com# ~/.ssh/configHost github.com  User git  HostName 192.30.252.131">
+<meta property="og:type" content="article">
+<meta property="og:title" content="好玩的ssh">
+<meta property="og:url" content="http://michaelhuang.github.io/2014/04/02/ssh_two/index.html">
+<meta property="og:site_name" content="huangzf's blog">
+<meta property="og:description" content="# git push 总特么timeout咋整# 这个命令是用来调试用的，用来挖地址挺不错的, 我就挖到一个ssh -vT git@github.com# ~/.ssh/configHost github.com  User git  HostName 192.30.252.131">
+<meta property="og:updated_time" content="2017-06-29T06:59:14.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="好玩的ssh">
+<meta name="twitter:description" content="# git push 总特么timeout咋整# 这个命令是用来调试用的，用来挖地址挺不错的, 我就挖到一个ssh -vT git@github.com# ~/.ssh/configHost github.com  User git  HostName 192.30.252.131">
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.4.x" />
+
+
+
+  <link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" />
+
+
+
+
+
+<script>
+  var CONFIG = {
+    search: false,
+    searchPath: "/search.xml",
+    fancybox: true,
+    toc: true,
+  }
+</script>
+
+
+
+
+  
+
+
+
+    <title> 好玩的ssh · huangzf's blog </title>
+  </head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">huangzf's blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    
+      <a href="/">
+        <li class="mobile-menu-item">
+          
+          
+            Home
+          
+        </li>
+      </a>
+    
+      <a href="/archives/">
+        <li class="mobile-menu-item">
+          
+          
+            Archives
+          
+        </li>
+      </a>
+    
+      <a href="/tags">
+        <li class="mobile-menu-item">
+          
+          
+            Tags
+          
+        </li>
+      </a>
+    
+      <a href="/categories">
+        <li class="mobile-menu-item">
+          
+          
+            Categories
+          
+        </li>
+      </a>
+    
+      <a href="/about">
+        <li class="mobile-menu-item">
+          
+          
+            About
+          
+        </li>
+      </a>
+    
+  </ul>
+</nav>
+
+    <div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">huangzf's blog</a>
+</div>
+
+<nav class="site-navbar">
+  
+    <ul id="menu" class="menu">
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/">
+            
+            
+              Home
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/archives/">
+            
+            
+              Archives
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/tags">
+            
+            
+              Tags
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/categories">
+            
+            
+              Categories
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/about">
+            
+            
+              About
+            
+          </a>
+        </li>
+      
+      
+    </ul>
+  
+</nav>
+
+      </header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content">
+            
+  
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">
+        
+          好玩的ssh
+        
+      </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          Apr 2, 2014
+        </span>
+      </div>
+    </header>
+
+    
+    
+  <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">Contents</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#ssh-agent-forwaring"><span class="toc-text">ssh agent forwaring</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ssh-local-port-forwarding"><span class="toc-text">ssh local port forwarding</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#git-push总提示输入username-passwd"><span class="toc-text">git push总提示输入username/passwd</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#神器-OSX-Fuse"><span class="toc-text">神器 OSX Fuse</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#vim-emacs-编辑远程文件"><span class="toc-text">vim / emacs 编辑远程文件</span></a></li></ol>
+    </div>
+  </div>
+
+
+    <div class="post-content">
+      
+        <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># git push 总特么timeout咋整</span></span><br><span class="line"><span class="comment"># 这个命令是用来调试用的，用来挖地址挺不错的, 我就挖到一个</span></span><br><span class="line">ssh -vT git@github.com</span><br><span class="line"><span class="comment"># ~/.ssh/config</span></span><br><span class="line">Host github.com</span><br><span class="line">  User git</span><br><span class="line">  HostName 192.30.252.131</span><br></pre></td></tr></table></figure>
+<hr>
+<a id="more"></a>
+<h2 id="ssh-agent-forwaring"><a href="#ssh-agent-forwaring" class="headerlink" title="ssh agent forwaring"></a><a href="http://www.unixwiz.net/techtips/ssh-agent-forwarding.html" target="_blank" rel="external">ssh agent forwaring</a></h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">+---------+     git push        +---------+       git <span class="built_in">clone</span>/pull      +---------+</span><br><span class="line">|  client | =================&gt;  |  github |    ==================&gt;    |  server |</span><br><span class="line">|         |                     |         |                           |         |</span><br><span class="line">+---------+                     +---------+                           +---------+</span><br></pre></td></tr></table></figure>
+<p>这个特性，deploy server的时候很方便；只需要添加client端的公钥到github即可~<br><a href="https://developer.github.com/guides/using-ssh-agent-forwarding/" target="_blank" rel="external">如何配置请温柔地点击我</a></p>
+<hr>
+<h2 id="ssh-local-port-forwarding"><a href="#ssh-local-port-forwarding" class="headerlink" title="ssh local port forwarding"></a>ssh local port forwarding</h2><p>出于安全考虑，server常规接口一般都会屏蔽掉，只留下80/443(webservers)、22(ssh, 当然sshd_config中可以更换掉), 但是有时候可能需要连接数据库，比如mysql(3306)，但是本地3306接口被屏蔽掉了，如何破？</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 连接本地10588接口即可连接远端mysql数据库_</span></span><br><span class="line"><span class="comment">#   -f    _后台运行_</span></span><br><span class="line"><span class="comment">#   -N    _禁止执行ssh remote command_</span></span><br><span class="line"><span class="comment">#   -L    _本地接口定向_</span></span><br><span class="line">ssh <span class="_">-f</span> -N -L 10588:127.0.0.1:3306 name@database.example.com</span><br><span class="line"></span><br><span class="line"><span class="comment"># ~/.ssh/config</span></span><br><span class="line">Host tunnel</span><br><span class="line">  HostName database.example.com</span><br><span class="line">  IdentityFile ~/.ssh/database.example.key</span><br><span class="line">  LocalForward 10588 127.0.0.1:3306</span><br><span class="line">  User name</span><br><span class="line"></span><br><span class="line">ssh <span class="_">-f</span> -N tunnel</span><br></pre></td></tr></table></figure>
+<p><a href="http://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers" target="_blank" rel="external">Well known ports</a></p>
+<hr>
+<h2 id="git-push总提示输入username-passwd"><a href="#git-push总提示输入username-passwd" class="headerlink" title="git push总提示输入username/passwd"></a>git push总提示输入username/passwd</h2><p>这是因为clone的时候用的https，改成ssh clone url<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git remote <span class="built_in">set</span>-url origin git@github.com:username/repo.git</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h2 id="神器-OSX-Fuse"><a href="#神器-OSX-Fuse" class="headerlink" title="神器 OSX Fuse"></a>神器 <a href="http://osxfuse.github.io/" target="_blank" rel="external">OSX Fuse</a></h2><p>scp这命令都知道啊，但是命令敲起来还是有点麻烦，能不能直接像操作本地文件系统一样操作远程文件那？装上他，只需要将远程文件夹挂载到本地指定文件路径即可实现</p>
+<hr>
+<h2 id="vim-emacs-编辑远程文件"><a href="#vim-emacs-编辑远程文件" class="headerlink" title="vim / emacs 编辑远程文件"></a>vim / emacs 编辑远程文件</h2><p><a href="http://vim.wikia.com/wiki/Editing_remote_files_via_scp_in_vim" target="_blank" rel="external">for vim</a><br><a href="https://www.gnu.org/software/emacs/manual/html_node/emacs/Remote-Files.html" target="_blank" rel="external">for emacs</a></p>
+<hr>
+
+      
+    </div>
+
+    
+      
+      
+
+
+
+      
+      
+    
+
+    
+      <footer class="post-footer">
+        
+          <div class="post-tags">
+            
+              <a href="/tags/ssh/">ssh</a>
+            
+          </div>
+        
+        
+        
+  <nav class="post-nav">
+    
+      <a class="prev" href="/2014/05/22/hammer/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">锤子发布会</span>
+        <span class="prev-text nav-mobile">Prev</span>
+      </a>
+    
+    
+      <a class="next" href="/2014/04/01/ssh_one/">
+        <span class="next-text nav-default">为何你的remote ssh command会报错(bash)</span>
+        <span class="prev-text nav-mobile">Next</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    
+  </nav>
+
+      </footer>
+    
+
+  </article>
+
+
+          </div>
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>  
+      </main>
+
+      <footer id="footer" class="footer">
+
+  <div class="social-links">
+    
+      
+        
+          <a href="mailto:michaelhuang12@gmail.com" class="iconfont icon-email" title="email"></a>
+        
+      
+    
+      
+    
+      
+        
+          <a href="https://twitter.com/ZhengfeiHuang" class="iconfont icon-twitter" title="twitter"></a>
+        
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        
+          <a href="https://github.com/michaelhuang" class="iconfont icon-github" title="github"></a>
+        
+      
+    
+      
+    
+      
+    
+      
+    
+    
+    
+      <a href="/atom.xml" class="iconfont icon-rss" title="rss"></a>
+    
+  </div>
+
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://hexo.io/">Hexo</a>
+  </span>
+  
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">
+    
+    &copy; 
+     
+      2015 - 
+    
+    2017
+
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">huangzf</span>
+  </span>
+</div>
+      </footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div>
+
+    
+  
+
+  
+  
+
+
+
+
+    
+  
+
+
+
+
+
+  
+    <script type="text/javascript" src="/lib/jquery/jquery-3.1.1.min.js"></script>
+  
+
+  
+    <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  
+
+  
+    <script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+  
+
+
+    <script type="text/javascript" src="/js/src/even.js?v=2.4.x"></script>
+<script type="text/javascript" src="/js/src/bootstrap.js?v=2.4.x"></script>
+
+    
+  </body>
+</html>

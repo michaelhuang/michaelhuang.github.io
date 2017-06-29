@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="description" content="Closures, Currying, Partials in Scala"/>
+
+
+
+
+  <meta name="keywords" content="Scala," />
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="huangzf's blog">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.4.x" />
+
+
+
+<link rel="canonical" href="http://michaelhuang.github.io/2016/07/02/closures-currying-partials/"/>
+
+
+<meta name="description" content="在FP里面很重要的三个理念：闭包，柯里化，偏函数；用Scala代码简单演示一下">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Closures, Currying, Partials in Scala">
+<meta property="og:url" content="http://michaelhuang.github.io/2016/07/02/closures-currying-partials/index.html">
+<meta property="og:site_name" content="huangzf's blog">
+<meta property="og:description" content="在FP里面很重要的三个理念：闭包，柯里化，偏函数；用Scala代码简单演示一下">
+<meta property="og:updated_time" content="2017-06-29T06:59:14.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Closures, Currying, Partials in Scala">
+<meta name="twitter:description" content="在FP里面很重要的三个理念：闭包，柯里化，偏函数；用Scala代码简单演示一下">
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.4.x" />
+
+
+
+  <link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" />
+
+
+
+
+
+<script>
+  var CONFIG = {
+    search: false,
+    searchPath: "/search.xml",
+    fancybox: true,
+    toc: true,
+  }
+</script>
+
+
+
+
+  
+
+
+
+    <title> Closures, Currying, Partials in Scala · huangzf's blog </title>
+  </head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">huangzf's blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    
+      <a href="/">
+        <li class="mobile-menu-item">
+          
+          
+            Home
+          
+        </li>
+      </a>
+    
+      <a href="/archives/">
+        <li class="mobile-menu-item">
+          
+          
+            Archives
+          
+        </li>
+      </a>
+    
+      <a href="/tags">
+        <li class="mobile-menu-item">
+          
+          
+            Tags
+          
+        </li>
+      </a>
+    
+      <a href="/categories">
+        <li class="mobile-menu-item">
+          
+          
+            Categories
+          
+        </li>
+      </a>
+    
+      <a href="/about">
+        <li class="mobile-menu-item">
+          
+          
+            About
+          
+        </li>
+      </a>
+    
+  </ul>
+</nav>
+
+    <div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">huangzf's blog</a>
+</div>
+
+<nav class="site-navbar">
+  
+    <ul id="menu" class="menu">
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/">
+            
+            
+              Home
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/archives/">
+            
+            
+              Archives
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/tags">
+            
+            
+              Tags
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/categories">
+            
+            
+              Categories
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/about">
+            
+            
+              About
+            
+          </a>
+        </li>
+      
+      
+    </ul>
+  
+</nav>
+
+      </header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content">
+            
+  
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">
+        
+          Closures, Currying, Partials in Scala
+        
+      </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          Jul 2, 2016
+        </span>
+      </div>
+    </header>
+
+    
+    
+  <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">Contents</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Closures"><span class="toc-text">Closures</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Currying"><span class="toc-text">Currying</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Partials"><span class="toc-text">Partials</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Reference"><span class="toc-text">Reference</span></a></li></ol></li></ol></li></ol>
+    </div>
+  </div>
+
+
+    <div class="post-content">
+      
+        <p>在FP里面很重要的三个理念：闭包，柯里化，偏函数；用Scala代码简单演示一下<br><a id="more"></a></p>
+<h2 id="Closures"><a href="#Closures" class="headerlink" title="Closures"></a>Closures</h2><p>wiki定义：闭包是由函数和与其相关的引用环境组合而成的实体.</p>
+<p>字面意思不是很好理解，看下面这个例子<br><figure class="highlight scala"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> otherscope &#123;</span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Foo</span> </span>&#123;</span><br><span class="line">        <span class="comment">// a method that takes a function and a string, and passes the string into</span></span><br><span class="line">        <span class="comment">// the function, and then executes the function</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">exec</span></span>(f:(<span class="type">String</span>) =&gt; <span class="type">Unit</span>, name: <span class="type">String</span>) &#123;</span><br><span class="line">            f(name)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">ClosureExample</span> <span class="keyword">extends</span> <span class="title">App</span> </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> hello = <span class="string">"Hello"</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">sayHello</span></span>(name: <span class="type">String</span>) &#123; println(<span class="string">s"<span class="subst">$hello</span>, <span class="subst">$name</span>"</span>) &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// execute sayHello from the exec method foo</span></span><br><span class="line">    <span class="keyword">val</span> foo = <span class="keyword">new</span> otherscope.<span class="type">Foo</span></span><br><span class="line">    foo.exec(sayHello, <span class="string">"Al"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// change the local variable 'hello', then execute sayHello from</span></span><br><span class="line">    <span class="comment">// the exec method of foo, and see what happens</span></span><br><span class="line">    hello = <span class="string">"Hola"</span></span><br><span class="line">    foo.exec(sayHello, <span class="string">"Lorenzo"</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Result:</span></span><br><span class="line"><span class="comment">// Hello, Al</span></span><br><span class="line"><span class="comment">// Hola, Lorenzo</span></span><br></pre></td></tr></table></figure></p>
+<p>你会发现，定义<code>sayHello()</code>的时候，没有入参<code>hello</code>! 但是呢，环顾四周还是有定义的，重要的是不仅第一次exec调用时获取到值，第二次调用竟会神奇的感知到<code>hello</code>的变更！</p>
+<p>在闭包概念里，<code>hello</code>这种类型的变量称为<code>free variable</code>，看名字就不是一个简单变量，实际上它是一个引用，或者叫指针，所以才能感知外围变量值的变化</p>
+<p>形象的两个比喻：文艺版，理工癌版</p>
+<ul>
+<li>这就像两个恋人至死不渝，由于某些原因被分割天涯，但是爱情的魔力使他俩仍能感知彼此；这两个恋人就是那个闭包函数和那个<code>free variable</code>！</li>
+<li>量子纠缠: 粒子在由两个或两个以上粒子组成系统中相互影响的现象，虽然粒子在空间上可能分开. 爱因斯坦将量子纠缠称为“鬼魅似的远距作用”（spooky action at a distance）</li>
+</ul>
+<p>同时也能看到FP里面实现闭包很简洁，因为天生支持高阶函数</p>
+<h2 id="Currying"><a href="#Currying" class="headerlink" title="Currying"></a>Currying</h2><p>wiki定义：是把接受多个参数的函数变换成接受一个单一参数(最初函数的第一个参数)的函数，并且返回接受余下的参数而且返回结果的新函数的技术.</p>
+<p>还是不直观，来看Scala例子<br><figure class="highlight scala"><table><tr><td class="code"><pre><span class="line"><span class="comment">// Type: (Int,Int) =&gt; Int</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">plus1</span></span>(x : <span class="type">Int</span>, y : <span class="type">Int</span>) = &#123;x + y&#125;   <span class="comment">// (9, 1) =&gt; &#123;9 + 1&#125;</span></span><br><span class="line"><span class="comment">// Type: Int =&gt; Int =&gt; Int</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">plus2</span></span>(x : <span class="type">Int</span>)(y : <span class="type">Int</span>) = &#123;x + y&#125;   <span class="comment">// (9)(1) =&gt; &#123;9 + y&#125; =&gt; &#123;9 + 1&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> p9 = plus2(<span class="number">9</span>)_</span><br><span class="line">p9(<span class="number">1</span>) <span class="comment">// Result: 10</span></span><br></pre></td></tr></table></figure></p>
+<p>你会发现<code>plus2</code>函数类型多了个<code>=&gt;</code>，这个符号表示转换，也就表明多了次转换；<code>val p9 = plus2(9)_ =&gt; plus2(9)(y) =&gt; {9 + y}</code>; 所以<code>p9(1) =&gt; 9 + 1 =&gt; 10</code>；</p>
+<p>回头再看定义是不是就明白了，Currying就是你给了部分参数，然后会对部分入参进行运算（能算多少算多少）得到一个新函数，并且这个新函数的入参就是你没给的那些参数，这个新函数就叫<code>curried function</code></p>
+<h2 id="Partials"><a href="#Partials" class="headerlink" title="Partials"></a>Partials</h2><p>wiki定义：<code>a partial function from X to Y (written as f: X ↛ Y) is a function f: X ′ → Y, for some subset X ′ of X</code><br>说白了就是一个全函数(接受所有入参集合)，但是只想拆分出来几个只能处理部分参数集合的子集函数<br><figure class="highlight scala"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">minus</span></span>(x: <span class="type">Int</span>, y: <span class="type">Int</span>) = &#123;x - y&#125;</span><br><span class="line"><span class="keyword">val</span> p9first = minus(<span class="number">9</span>, _: <span class="type">Int</span>)</span><br><span class="line">p9first(<span class="number">1</span>)  <span class="comment">// Result:  8</span></span><br><span class="line"><span class="keyword">val</span> p9second = minus(_: <span class="type">Int</span>, <span class="number">9</span>)</span><br><span class="line">p9second(<span class="number">1</span>) <span class="comment">// Result: -8</span></span><br></pre></td></tr></table></figure></p>
+<p>比如<code>minus</code>是全函数，可以接收任何可能的(x,y)作为入参，但是我只想考虑(x=9,y=any)的入参集合，或者(x=any,y=9)的入参集合；可能这个不是很标准，Scala的标准做法是使用<code>PartialFunction</code>，感兴趣的话可以参考Reference</p>
+<h4 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h4><ul>
+<li><a href="http://robpatro.com/blog/?p=53" target="_blank" rel="external">http://robpatro.com/blog/?p=53</a></li>
+<li><a href="http://alvinalexander.com/scala/how-to-use-closures-in-scala-fp-examples" target="_blank" rel="external">http://alvinalexander.com/scala/how-to-use-closures-in-scala-fp-examples</a></li>
+<li><a href="http://alvinalexander.com/scala/how-to-define-use-partial-functions-in-scala-syntax-examples" target="_blank" rel="external">http://alvinalexander.com/scala/how-to-define-use-partial-functions-in-scala-syntax-examples</a></li>
+</ul>
+
+      
+    </div>
+
+    
+      
+      
+
+
+
+      
+      
+    
+
+    
+      <footer class="post-footer">
+        
+          <div class="post-tags">
+            
+              <a href="/tags/Scala/">Scala</a>
+            
+          </div>
+        
+        
+        
+  <nav class="post-nav">
+    
+      <a class="prev" href="/2016/09/04/lock_redis/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">你的分布式锁安全吗?</span>
+        <span class="prev-text nav-mobile">Prev</span>
+      </a>
+    
+    
+      <a class="next" href="/2016/06/26/Functional-Programming-Principles-in-Scala/">
+        <span class="next-text nav-default">Principles in Scala(一)</span>
+        <span class="prev-text nav-mobile">Next</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    
+  </nav>
+
+      </footer>
+    
+
+  </article>
+
+
+          </div>
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>  
+      </main>
+
+      <footer id="footer" class="footer">
+
+  <div class="social-links">
+    
+      
+        
+          <a href="mailto:michaelhuang12@gmail.com" class="iconfont icon-email" title="email"></a>
+        
+      
+    
+      
+    
+      
+        
+          <a href="https://twitter.com/ZhengfeiHuang" class="iconfont icon-twitter" title="twitter"></a>
+        
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        
+          <a href="https://github.com/michaelhuang" class="iconfont icon-github" title="github"></a>
+        
+      
+    
+      
+    
+      
+    
+      
+    
+    
+    
+      <a href="/atom.xml" class="iconfont icon-rss" title="rss"></a>
+    
+  </div>
+
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://hexo.io/">Hexo</a>
+  </span>
+  
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">
+    
+    &copy; 
+     
+      2015 - 
+    
+    2017
+
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">huangzf</span>
+  </span>
+</div>
+      </footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div>
+
+    
+  
+
+  
+  
+
+
+
+
+    
+  
+
+
+
+
+
+  
+    <script type="text/javascript" src="/lib/jquery/jquery-3.1.1.min.js"></script>
+  
+
+  
+    <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  
+
+  
+    <script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+  
+
+
+    <script type="text/javascript" src="/js/src/even.js?v=2.4.x"></script>
+<script type="text/javascript" src="/js/src/bootstrap.js?v=2.4.x"></script>
+
+    
+  </body>
+</html>

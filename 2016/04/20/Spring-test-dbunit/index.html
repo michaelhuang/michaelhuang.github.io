@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="description" content="Spring test dbunit"/>
+
+
+
+
+  <meta name="keywords" content="Spring,dbunit," />
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="huangzf's blog">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.4.x" />
+
+
+
+<link rel="canonical" href="http://michaelhuang.github.io/2016/04/20/Spring-test-dbunit/"/>
+
+
+<meta name="description" content="如何基于 Spring testing framework + DBUnit 简单实现一个自动化测试工具？
+
+@Test@DataSets(setUpDataSet = &quot;setUp.xls&quot;, expectDataSet = &quot;expect.xls&quot;)public void test() &amp;#123;&amp;#125;
+测试方法执行前，先loadsetUp.xls中数据到测试库，测试方法结束后，自动">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring test dbunit">
+<meta property="og:url" content="http://michaelhuang.github.io/2016/04/20/Spring-test-dbunit/index.html">
+<meta property="og:site_name" content="huangzf's blog">
+<meta property="og:description" content="如何基于 Spring testing framework + DBUnit 简单实现一个自动化测试工具？
+
+@Test@DataSets(setUpDataSet = &quot;setUp.xls&quot;, expectDataSet = &quot;expect.xls&quot;)public void test() &amp;#123;&amp;#125;
+测试方法执行前，先loadsetUp.xls中数据到测试库，测试方法结束后，自动">
+<meta property="og:updated_time" content="2017-06-29T06:59:14.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spring test dbunit">
+<meta name="twitter:description" content="如何基于 Spring testing framework + DBUnit 简单实现一个自动化测试工具？
+
+@Test@DataSets(setUpDataSet = &quot;setUp.xls&quot;, expectDataSet = &quot;expect.xls&quot;)public void test() &amp;#123;&amp;#125;
+测试方法执行前，先loadsetUp.xls中数据到测试库，测试方法结束后，自动">
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.4.x" />
+
+
+
+  <link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" />
+
+
+
+
+
+<script>
+  var CONFIG = {
+    search: false,
+    searchPath: "/search.xml",
+    fancybox: true,
+    toc: true,
+  }
+</script>
+
+
+
+
+  
+
+
+
+    <title> Spring test dbunit · huangzf's blog </title>
+  </head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">huangzf's blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    
+      <a href="/">
+        <li class="mobile-menu-item">
+          
+          
+            Home
+          
+        </li>
+      </a>
+    
+      <a href="/archives/">
+        <li class="mobile-menu-item">
+          
+          
+            Archives
+          
+        </li>
+      </a>
+    
+      <a href="/tags">
+        <li class="mobile-menu-item">
+          
+          
+            Tags
+          
+        </li>
+      </a>
+    
+      <a href="/categories">
+        <li class="mobile-menu-item">
+          
+          
+            Categories
+          
+        </li>
+      </a>
+    
+      <a href="/about">
+        <li class="mobile-menu-item">
+          
+          
+            About
+          
+        </li>
+      </a>
+    
+  </ul>
+</nav>
+
+    <div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">huangzf's blog</a>
+</div>
+
+<nav class="site-navbar">
+  
+    <ul id="menu" class="menu">
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/">
+            
+            
+              Home
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/archives/">
+            
+            
+              Archives
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/tags">
+            
+            
+              Tags
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/categories">
+            
+            
+              Categories
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/about">
+            
+            
+              About
+            
+          </a>
+        </li>
+      
+      
+    </ul>
+  
+</nav>
+
+      </header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content">
+            
+  
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">
+        
+          Spring test dbunit
+        
+      </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          Apr 20, 2016
+        </span>
+      </div>
+    </header>
+
+    
+    
+  <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">Contents</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#定义注解"><span class="toc-text">定义注解</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#初始化XlsFileLoader和DataSourceDatabaseTester"><span class="toc-text">初始化XlsFileLoader和DataSourceDatabaseTester</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#实现TestExecutionListener"><span class="toc-text">实现TestExecutionListener</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#配置使用"><span class="toc-text">配置使用</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Reference"><span class="toc-text">Reference</span></a></li></ol></li></ol></li></ol>
+    </div>
+  </div>
+
+
+    <div class="post-content">
+      
+        <blockquote>
+<p>如何基于 <code>Spring testing framework + DBUnit</code> 简单实现一个自动化测试工具？</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="meta">@DataSets</span>(setUpDataSet = <span class="string">"setUp.xls"</span>, expectDataSet = <span class="string">"expect.xls"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试方法执行前，先load<code>setUp.xls</code>中数据到测试库，测试方法结束后，自动和<code>expect.xls</code>中数据做比对；excel里面保存的是表的数据，多个表以多个sheet页形式体现，<code>sheet name</code>即是<code>table name</code>；其实github上已经有个功能非常完善的工具<a href="http://springtestdbunit.github.io/spring-test-dbunit/index.html" target="_blank" rel="external">Spring Test DBUnit</a>，这里只是说下大体实现思路</p>
+<a id="more"></a>
+<h2 id="定义注解"><a href="#定义注解" class="headerlink" title="定义注解"></a>定义注解</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="meta">@Target</span>(ElementType.METHOD)</span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> DataSets &#123;</span><br><span class="line">  <span class="function">String <span class="title">setUpDataSet</span><span class="params">()</span> <span class="keyword">default</span> ""</span>;</span><br><span class="line">  <span class="function">String <span class="title">expectDataSet</span><span class="params">()</span> <span class="keyword">default</span> ""</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="初始化XlsFileLoader和DataSourceDatabaseTester"><a href="#初始化XlsFileLoader和DataSourceDatabaseTester" class="headerlink" title="初始化XlsFileLoader和DataSourceDatabaseTester"></a>初始化XlsFileLoader和DataSourceDatabaseTester</h2><p><code>dbunit-2.4.8</code>中已经有现成的<code>org.dbunit.util.fileloader.XlsDataFileLoader</code>，蛋疼的是它是从<code>getClass().getResource(filename)</code>加载，建议重写一个，从<code>ClassPathResource(filename).getURL()</code>加载</p>
+<p>一般项目构建都会配置<code>dataSource</code>，所以用<code>DataSourceDatabaseTester</code>再合适不过，它来管理测试过程中数据库连接的创建销毁，以及最最重要的，根据具体<code>DatabaseOperation</code>处理数据集；有个地方要注意一下，连接属性最好设置一下数据库类型，方式是实现<code>IOperationListener</code>接口中<code>connectionRetrieved()</code>加入下面代码，这个方法会在每次new或retrieved一个连接后立即调用<br><figure class="highlight java"><table><tr><td class="code"><pre><span class="line">connection.getConfig().setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, <span class="keyword">new</span> MySqlDataTypeFactory())</span><br></pre></td></tr></table></figure></p>
+<p>配置bean<br><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@ImportResource</span>(<span class="string">"classpath:/application-root-bean.xml"</span>)</span><br><span class="line"><span class="meta">@Profile</span>(<span class="string">"test"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ServiceTestConfig</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Autowired</span></span><br><span class="line">  DataSource dataSource;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Bean</span>(name=<span class="string">"databaseTester"</span>)</span><br><span class="line">  <span class="function"><span class="keyword">public</span> DataSourceDatabaseTester <span class="title">dataSourceDatabaseTester</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    DataSourceDatabaseTester databaseTester = <span class="keyword">new</span> DataSourceDatabaseTester(dataSource());</span><br><span class="line">    databaseTester.setOperationListener(<span class="keyword">new</span> CustOperationListener());</span><br><span class="line">    <span class="keyword">return</span> databaseTester;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Bean</span>(name=<span class="string">"xlsDataFileLoader"</span>)</span><br><span class="line">  <span class="function"><span class="keyword">public</span> CustomXlsFileLoader <span class="title">xlsDataFileLoader</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> CustomXlsFileLoader();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="实现TestExecutionListener"><a href="#实现TestExecutionListener" class="headerlink" title="实现TestExecutionListener"></a>实现TestExecutionListener</h2><ul>
+<li>首先<code>prepareTestInstance()</code>中<code>DI</code></li>
+<li>接着<code>beforeTestMethod()</code>中加载<code>setUpDataSet</code></li>
+<li>最后<code>afterTestMethod()</code>中比对<code>expectDataSet</code></li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ServiceTestExecutionListener</span> <span class="keyword">implements</span> <span class="title">TestExecutionListener</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span> IDatabaseTester databaseTester;</span><br><span class="line">  <span class="keyword">private</span> CustomXlsFileLoader xlsFileLoader;</span><br><span class="line">  <span class="keyword">private</span> IDataSet expectDataSet;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">prepareTestInstance</span><span class="params">(TestContext testCtx)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    databaseTester = (IDatabaseTester) testCtx.getApplicationContext().getBean(<span class="string">"databaseTester"</span>);</span><br><span class="line">    xlsFileLoader = (CustomXlsFileLoader) testCtx.getApplicationContext().getBean(<span class="string">"xlsDataFileLoader"</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">beforeTestMethod</span><span class="params">(TestContext testCtx)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    <span class="comment">// Check for existence of DataSets annotation for the method under testing</span></span><br><span class="line">    DataSets dataSetAnnotation = testCtx.getTestMethod().getAnnotation(DataSets.class);</span><br><span class="line">    <span class="keyword">if</span> ( dataSetAnnotation == <span class="keyword">null</span> ) &#123;</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    String dataSetName = dataSetAnnotation.setUpDataSet();</span><br><span class="line">    <span class="keyword">if</span> ( ! <span class="string">""</span>.equals(dataSetName) ) &#123;</span><br><span class="line">      IDataSet dataSet = xlsFileLoader.load(dataSetName);</span><br><span class="line">      databaseTester.setDataSet(dataSet);</span><br><span class="line">      databaseTester.onSetup();</span><br><span class="line">    &#125;</span><br><span class="line">    String expectDataName = dataSetAnnotation.expectDataSet();</span><br><span class="line">    <span class="keyword">if</span> ( ! <span class="string">""</span>.equals(expectDataName)) &#123;</span><br><span class="line">      expectDataSet = xlsFileLoader.load(expectDataName);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">afterTestMethod</span><span class="params">(TestContext testCtx)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> ( <span class="keyword">null</span> != expectDataSet &amp;&amp; <span class="keyword">null</span> != databaseTester) &#123;</span><br><span class="line">        IDatabaseConnection connection = databaseTester.getConnection();</span><br><span class="line">        connection.getConfig().setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, <span class="keyword">new</span> MySqlDataTypeFactory());</span><br><span class="line">        IDataSet actualDataSet = connection.createDataSet();</span><br><span class="line">        Assert.assertNotNull(actualDataSet);</span><br><span class="line">        <span class="keyword">for</span> (String tableName : expectDataSet.getTableNames()) &#123;</span><br><span class="line">          <span class="comment">// 以expectDataSet中字段为准，比如CREATE_TIME, MODIFY_TIME这种字段比较是没有意义的</span></span><br><span class="line">          ITable filteredTable = DefaultColumnFilter.includedColumnsTable(actualDataSet.getTable(tableName),</span><br><span class="line">            expectDataSet.getTableMetaData(tableName).getColumns());</span><br><span class="line">          Assertion.assertEquals(expectDataSet.getTable(tableName), filteredTable);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">      <span class="keyword">throw</span> e;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">      <span class="comment">// Clear up testing data if exists</span></span><br><span class="line">      <span class="keyword">if</span> (databaseTester != <span class="keyword">null</span>) &#123;</span><br><span class="line">        databaseTester.onTearDown();</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">beforeTestClass</span><span class="params">(TestContext testCtx)</span> <span class="keyword">throws</span> Exception </span>&#123;&#125;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">afterTestClass</span><span class="params">(TestContext testCtx)</span> <span class="keyword">throws</span> Exception </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="配置使用"><a href="#配置使用" class="headerlink" title="配置使用"></a>配置使用</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@RunWith</span>(SpringJUnit4ClassRunner.class)</span><br><span class="line"><span class="meta">@ContextConfiguration</span>(classes = &#123;ServiceTestConfig.class&#125;)</span><br><span class="line"><span class="meta">@TestExecutionListeners</span>(&#123;ServiceTestExecutionListener.class&#125;)</span><br><span class="line"><span class="meta">@ActiveProfiles</span>(<span class="string">"test"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">AbstractServiceTest</span> <span class="keyword">extends</span> <span class="title">AbstractTransactionalJUnit4SpringContextTests</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h4><ul>
+<li><a href="http://dbunit.sourceforge.net/howto.html" target="_blank" rel="external">DBUnit</a></li>
+<li><a href="http://www.shenyanchao.cn/blog/2013/06/27/usage-dbunit/" target="_blank" rel="external">DBUnit使用案例</a></li>
+<li><a href="http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/test/context/TestExecutionListener.html" target="_blank" rel="external">Spring TestExecutionListener</a></li>
+<li><a href="http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/context/annotation/Configuration.html" target="_blank" rel="external">Spring Configuration</a></li>
+<li><a href="http://www.ibm.com/developerworks/cn/webservices/ws-springjava/index.html" target="_blank" rel="external">纯Java配置bean</a></li>
+<li><a href="http://docs.spring.io/spring/docs/3.2.x/spring-framework-reference/html/testing.html" target="_blank" rel="external">spring-framework-reference-testing</a></li>
+</ul>
+
+      
+    </div>
+
+    
+      
+      
+
+
+
+      
+      
+    
+
+    
+      <footer class="post-footer">
+        
+          <div class="post-tags">
+            
+              <a href="/tags/Spring/">Spring</a>
+            
+              <a href="/tags/dbunit/">dbunit</a>
+            
+          </div>
+        
+        
+        
+  <nav class="post-nav">
+    
+      <a class="prev" href="/2016/06/06/MIT_linear/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">MIT线代笔记</span>
+        <span class="prev-text nav-mobile">Prev</span>
+      </a>
+    
+    
+      <a class="next" href="/2016/04/15/Hadoop-learning-notes-Data-Ingestion/">
+        <span class="next-text nav-default">Data Ingestion</span>
+        <span class="prev-text nav-mobile">Next</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    
+  </nav>
+
+      </footer>
+    
+
+  </article>
+
+
+          </div>
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>  
+      </main>
+
+      <footer id="footer" class="footer">
+
+  <div class="social-links">
+    
+      
+        
+          <a href="mailto:michaelhuang12@gmail.com" class="iconfont icon-email" title="email"></a>
+        
+      
+    
+      
+    
+      
+        
+          <a href="https://twitter.com/ZhengfeiHuang" class="iconfont icon-twitter" title="twitter"></a>
+        
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        
+          <a href="https://github.com/michaelhuang" class="iconfont icon-github" title="github"></a>
+        
+      
+    
+      
+    
+      
+    
+      
+    
+    
+    
+      <a href="/atom.xml" class="iconfont icon-rss" title="rss"></a>
+    
+  </div>
+
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://hexo.io/">Hexo</a>
+  </span>
+  
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">
+    
+    &copy; 
+     
+      2015 - 
+    
+    2017
+
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">huangzf</span>
+  </span>
+</div>
+      </footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div>
+
+    
+  
+
+  
+  
+
+
+
+
+    
+  
+
+
+
+
+
+  
+    <script type="text/javascript" src="/lib/jquery/jquery-3.1.1.min.js"></script>
+  
+
+  
+    <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  
+
+  
+    <script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+  
+
+
+    <script type="text/javascript" src="/js/src/even.js?v=2.4.x"></script>
+<script type="text/javascript" src="/js/src/bootstrap.js?v=2.4.x"></script>
+
+    
+  </body>
+</html>

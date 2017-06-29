@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="description" content="为何你的remote ssh command会报错(bash)"/>
+
+
+
+
+  <meta name="keywords" content="ssh," />
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="huangzf's blog">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.4.x" />
+
+
+
+<link rel="canonical" href="http://michaelhuang.github.io/2014/04/01/ssh_one/"/>
+
+
+<meta name="description" content="先说下这问题咋来的，目前开发流程如下：
++---------------+       scp files...                     +-----------------+| localhost     |  ===================================&amp;gt;  | remote host     ||   for coding  |   remot">
+<meta property="og:type" content="article">
+<meta property="og:title" content="为何你的remote ssh command会报错(bash)">
+<meta property="og:url" content="http://michaelhuang.github.io/2014/04/01/ssh_one/index.html">
+<meta property="og:site_name" content="huangzf's blog">
+<meta property="og:description" content="先说下这问题咋来的，目前开发流程如下：
++---------------+       scp files...                     +-----------------+| localhost     |  ===================================&amp;gt;  | remote host     ||   for coding  |   remot">
+<meta property="og:image" content="http://wholetsthedogout.qiniudn.com/bash_init.png">
+<meta property="og:updated_time" content="2017-06-29T06:59:14.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="为何你的remote ssh command会报错(bash)">
+<meta name="twitter:description" content="先说下这问题咋来的，目前开发流程如下：
++---------------+       scp files...                     +-----------------+| localhost     |  ===================================&amp;gt;  | remote host     ||   for coding  |   remot">
+<meta name="twitter:image" content="http://wholetsthedogout.qiniudn.com/bash_init.png">
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.4.x" />
+
+
+
+  <link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" />
+
+
+
+
+
+<script>
+  var CONFIG = {
+    search: false,
+    searchPath: "/search.xml",
+    fancybox: true,
+    toc: true,
+  }
+</script>
+
+
+
+
+  
+
+
+
+    <title> 为何你的remote ssh command会报错(bash) · huangzf's blog </title>
+  </head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">huangzf's blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    
+      <a href="/">
+        <li class="mobile-menu-item">
+          
+          
+            Home
+          
+        </li>
+      </a>
+    
+      <a href="/archives/">
+        <li class="mobile-menu-item">
+          
+          
+            Archives
+          
+        </li>
+      </a>
+    
+      <a href="/tags">
+        <li class="mobile-menu-item">
+          
+          
+            Tags
+          
+        </li>
+      </a>
+    
+      <a href="/categories">
+        <li class="mobile-menu-item">
+          
+          
+            Categories
+          
+        </li>
+      </a>
+    
+      <a href="/about">
+        <li class="mobile-menu-item">
+          
+          
+            About
+          
+        </li>
+      </a>
+    
+  </ul>
+</nav>
+
+    <div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">huangzf's blog</a>
+</div>
+
+<nav class="site-navbar">
+  
+    <ul id="menu" class="menu">
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/">
+            
+            
+              Home
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/archives/">
+            
+            
+              Archives
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/tags">
+            
+            
+              Tags
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/categories">
+            
+            
+              Categories
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/about">
+            
+            
+              About
+            
+          </a>
+        </li>
+      
+      
+    </ul>
+  
+</nav>
+
+      </header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content">
+            
+  
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">
+        
+          为何你的remote ssh command会报错(bash)
+        
+      </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          Apr 1, 2014
+        </span>
+      </div>
+    </header>
+
+    
+    
+  <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">Contents</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Shell-modes"><span class="toc-text">Shell modes</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#login"><span class="toc-text">login</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#interactive"><span class="toc-text">interactive</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Test"><span class="toc-text">Test</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Shell-init-files"><span class="toc-text">Shell init files</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Answer"><span class="toc-text">Answer</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Reference"><span class="toc-text">Reference</span></a></li></ol></li></ol></li></ol>
+    </div>
+  </div>
+
+
+    <div class="post-content">
+      
+        <p>先说下这问题咋来的，目前开发流程如下：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">+---------------+       scp files...                     +-----------------+</span><br><span class="line">| localhost     |  ===================================&gt;  | remote host     |</span><br><span class="line">|   <span class="keyword">for</span> coding  |   remote ssh <span class="built_in">command</span> <span class="keyword">for</span> compiling     |   <span class="keyword">for</span> compiling |</span><br><span class="line">+---------------+                                        +-----------------+</span><br></pre></td></tr></table></figure>
+<p>如上图，代码是本地马吊们敲出来地，so文件是要放到远程开发环境编译出来地；<br>普通青年尼，可能是打开xshell，xftp，先把文件拖上去，然后ssh登陆编译环境，然后make;<br>效率极低不说，逼格也不够啊，于是乎就有了下面代码：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">scp *<span class="variable">$1</span>*.&#123;gcc,h,pc,cpp&#125; ya-dev:~/src</span><br><span class="line">ssh ya-dev <span class="string">'cd ~/src; ls '</span><span class="string">"*<span class="variable">$1</span>*"</span><span class="string">'.gcc  | xargs -I &#123;&#125; make -f &#123;&#125; ORA_VER=10'</span></span><br></pre></td></tr></table></figure>
+<p>问题来了，远程执行会报错，部分lib库找不到；但是ssh登陆后再执行就没问题~<br><code>ssh ya-dev env</code> 一看，果然缺少很多环境变量，为什么会这样呢，这就要从爷爷粮票的故事讲起了~</p>
+<a id="more"></a>
+<hr>
+<h2 id="Shell-modes"><a href="#Shell-modes" class="headerlink" title="Shell modes"></a>Shell modes</h2><p>主要有以下两种模式</p>
+<h4 id="login"><a href="#login" class="headerlink" title="login"></a>login</h4><ul>
+<li>你打开一个shell或者terminal，提示输入用户名密码才能登陆，这就是个login shell</li>
+<li>如果你打开terminal就能直接用，那non-login shell(Mac OSX特殊一些)</li>
+<li>总玩ubuntu的应该知道，<code>Ctrl</code> + <code>Alt</code> + <code>F1</code>  出来的就是个login shell</li>
+</ul>
+<h4 id="interactive"><a href="#interactive" class="headerlink" title="interactive"></a>interactive</h4><ul>
+<li>你打开的shell有prompt，并且它的stdin、stderr都定向到terminal</li>
+<li>上面那是术语，名字就能看出来，互动嘛，你通过ssh登录远程机器，ssh server肯定要给你个pty吧，好让你执行命令</li>
+</ul>
+<hr>
+<h2 id="Test"><a href="#Test" class="headerlink" title="Test"></a>Test</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">me@<span class="built_in">local</span>-mac$  `[[ $- == *i* ]] &amp;&amp; <span class="built_in">echo</span> <span class="string">'Interactive'</span> || <span class="built_in">echo</span> <span class="string">'Not interactive'</span>`</span><br><span class="line">Interactive</span><br><span class="line">me@<span class="built_in">local</span>-mac$  `<span class="built_in">shopt</span> -q login_shell &amp;&amp; <span class="built_in">echo</span> <span class="string">'Login shell'</span> || <span class="built_in">echo</span> <span class="string">'Not login shell'</span>`</span><br><span class="line">Login shell    <span class="comment"># 特殊 for mac osx</span></span><br><span class="line"></span><br><span class="line">me@<span class="built_in">local</span>-mac$  `ssh ubuntu <span class="string">"[[ $- == *i* ]] &amp;&amp; echo 'Interactive' || echo 'Not interactive'"</span>`</span><br><span class="line">Interactive    <span class="comment"># 因为我用的terminal是interactive</span></span><br><span class="line">me@<span class="built_in">local</span>-mac$  `ssh ubuntu <span class="string">"shopt -q login_shell &amp;&amp; echo 'Login shell' || echo 'Not login shell'"</span>`</span><br><span class="line">Not login shell</span><br><span class="line"></span><br><span class="line">me@<span class="built_in">local</span>-ubuntu$ `[[ $- == *i* ]] &amp;&amp; <span class="built_in">echo</span> <span class="string">'Interactive'</span> || <span class="built_in">echo</span> <span class="string">'Not interactive'</span>`</span><br><span class="line">Interactive</span><br><span class="line">me@<span class="built_in">local</span>-ubuntu$ `<span class="built_in">shopt</span> -q login_shell &amp;&amp; <span class="built_in">echo</span> <span class="string">'Login shell'</span> || <span class="built_in">echo</span> <span class="string">'Not login shell'</span>`</span><br><span class="line">Not login shell  <span class="comment"># 有别于mac osx</span></span><br><span class="line"></span><br><span class="line">me@<span class="built_in">local</span>-mac$ `bash test.sh`</span><br><span class="line">Not interactive  <span class="comment"># bash script.sh：non-login,non-interactive; 说明ssh remote command 是 non-login,non-interactive</span></span><br><span class="line">me@<span class="built_in">local</span>-mac$ `cat test.sh`</span><br><span class="line">ssh ubuntu <span class="string">"[[ $- == *i* ]] &amp;&amp; echo 'Interactive' || echo 'Not interactive'"</span></span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="Shell-init-files"><a href="#Shell-init-files" class="headerlink" title="Shell init files"></a>Shell init files</h2><p><img src="http://wholetsthedogout.qiniudn.com/bash_init.png" alt="how the bash load init files"></p>
+<hr>
+<h2 id="Answer"><a href="#Answer" class="headerlink" title="Answer"></a>Answer</h2><p>回到开篇问题，为什么少了很多环境变量那，从上图可以看出，俺的脚本是non-login,non-interactive<br>所以.bash_profile,.bashrc都没被执行到~</p>
+<p><em>解决方法</em>：</p>
+<ol>
+<li>用到的变量都加到<code>/etc/environment</code>中，这个就是全局了，如果你不想影响其他用户，请看下一方法</li>
+<li>sshd_config配置项PermitUserEnvironment<ul>
+<li>vim <code>/etc/sshd_config</code>, add <code>&#39;PermitUserEnvironment yes&#39;</code></li>
+<li>添加变量到<code>~/.ssh/environment</code></li>
+<li><code>service ssh restart</code></li>
+<li><code>ssh remote env</code> 测试一下</li>
+</ul>
+</li>
+<li><code>$BASH_ENV</code><ul>
+<li>这个变量默认是空值，在哪有效设置让我有些迷惑</li>
+<li>你想想，放到<code>/etc/enviroment</code>里吧，不如直接方法1了</li>
+<li>放到<code>~/.bash_profile ~/.bashrc</code>里吧，就像之前说的，是读取不到的</li>
+<li>google到一方法，通过<a href="http://seejeffrun.blogspot.com/2008/04/cron-doesnt-read-minds-customizing-my.html" target="_blank" rel="external">crontab</a>来解决</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h4 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h4><ul>
+<li><a href="http://capistranorb.com/documentation/faq/why-does-something-work-in-my-ssh-session-but-not-in-capistrano/" target="_blank" rel="external">Why does something work in my SSH session, but not in Capistrano?</a></li>
+<li><a href="http://www.solipsys.co.uk/new/BashInitialisationFiles.html" target="_blank" rel="external">Bash init files</a></li>
+<li><a href="https://github.com/sstephenson/rbenv/wiki/Unix-shell-initialization" target="_blank" rel="external">rbenv unix shell initialization</a></li>
+<li><a href="http://www.tldp.org/LDP/abs/html/intandnonint.html" target="_blank" rel="external">Interactive and non-interactive shells and scripts</a></li>
+<li><a href="https://www.gnu.org/software/bash/manual/html_node/Bash-Startup-Files.html" target="_blank" rel="external">Bash startup files</a></li>
+<li><a href="http://www.thinkplexx.com/learn/howto/security/ssh/setting-ssh-remote-host-environment-variables-interactive-shell" target="_blank" rel="external">Setting ssh remote host environment variables</a></li>
+<li><a href="http://linux.die.net/man/5/ssh_config" target="_blank" rel="external">ssh_config(5) - Linux man page</a></li>
+</ul>
+
+      
+    </div>
+
+    
+      
+      
+
+
+
+      
+      
+    
+
+    
+      <footer class="post-footer">
+        
+          <div class="post-tags">
+            
+              <a href="/tags/ssh/">ssh</a>
+            
+          </div>
+        
+        
+        
+  <nav class="post-nav">
+    
+      <a class="prev" href="/2014/04/02/ssh_two/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">好玩的ssh</span>
+        <span class="prev-text nav-mobile">Prev</span>
+      </a>
+    
+    
+      <a class="next" href="/2014/03/31/pic_test/">
+        <span class="next-text nav-default">Assassins</span>
+        <span class="prev-text nav-mobile">Next</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    
+  </nav>
+
+      </footer>
+    
+
+  </article>
+
+
+          </div>
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>  
+      </main>
+
+      <footer id="footer" class="footer">
+
+  <div class="social-links">
+    
+      
+        
+          <a href="mailto:michaelhuang12@gmail.com" class="iconfont icon-email" title="email"></a>
+        
+      
+    
+      
+    
+      
+        
+          <a href="https://twitter.com/ZhengfeiHuang" class="iconfont icon-twitter" title="twitter"></a>
+        
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        
+          <a href="https://github.com/michaelhuang" class="iconfont icon-github" title="github"></a>
+        
+      
+    
+      
+    
+      
+    
+      
+    
+    
+    
+      <a href="/atom.xml" class="iconfont icon-rss" title="rss"></a>
+    
+  </div>
+
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://hexo.io/">Hexo</a>
+  </span>
+  
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">
+    
+    &copy; 
+     
+      2015 - 
+    
+    2017
+
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">huangzf</span>
+  </span>
+</div>
+      </footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div>
+
+    
+  
+
+  
+  
+
+
+
+
+    
+  
+
+
+
+
+
+  
+    <script type="text/javascript" src="/lib/jquery/jquery-3.1.1.min.js"></script>
+  
+
+  
+    <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  
+
+  
+    <script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+  
+
+
+    <script type="text/javascript" src="/js/src/even.js?v=2.4.x"></script>
+<script type="text/javascript" src="/js/src/bootstrap.js?v=2.4.x"></script>
+
+    
+  </body>
+</html>

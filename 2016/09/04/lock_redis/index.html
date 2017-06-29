@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="description" content="你的分布式锁安全吗?"/>
+
+
+
+
+  <meta name="keywords" content="redis,lock," />
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="huangzf's blog">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.4.x" />
+
+
+
+<link rel="canonical" href="http://michaelhuang.github.io/2016/09/04/lock_redis/"/>
+
+
+<meta name="description" content="首先你必须弄清楚，用分布式锁来做什么？是解决效率问题，还是一致性问题；不能混为一谈，跟个追星族一样，哪个工具火就用哪个，比如Redis很火，什么都用它，锁就想当然的用Redlock；如果是效率问题，那可能还好一些；但是如果是一致性问题，那你得认真对待，你目前的实现方案可能会某一天让你痛苦不堪！">
+<meta property="og:type" content="article">
+<meta property="og:title" content="你的分布式锁安全吗?">
+<meta property="og:url" content="http://michaelhuang.github.io/2016/09/04/lock_redis/index.html">
+<meta property="og:site_name" content="huangzf's blog">
+<meta property="og:description" content="首先你必须弄清楚，用分布式锁来做什么？是解决效率问题，还是一致性问题；不能混为一谈，跟个追星族一样，哪个工具火就用哪个，比如Redis很火，什么都用它，锁就想当然的用Redlock；如果是效率问题，那可能还好一些；但是如果是一致性问题，那你得认真对待，你目前的实现方案可能会某一天让你痛苦不堪！">
+<meta property="og:updated_time" content="2017-06-29T06:59:14.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="你的分布式锁安全吗?">
+<meta name="twitter:description" content="首先你必须弄清楚，用分布式锁来做什么？是解决效率问题，还是一致性问题；不能混为一谈，跟个追星族一样，哪个工具火就用哪个，比如Redis很火，什么都用它，锁就想当然的用Redlock；如果是效率问题，那可能还好一些；但是如果是一致性问题，那你得认真对待，你目前的实现方案可能会某一天让你痛苦不堪！">
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.4.x" />
+
+
+
+  <link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" />
+
+
+
+
+
+<script>
+  var CONFIG = {
+    search: false,
+    searchPath: "/search.xml",
+    fancybox: true,
+    toc: true,
+  }
+</script>
+
+
+
+
+  
+
+
+
+    <title> 你的分布式锁安全吗? · huangzf's blog </title>
+  </head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">huangzf's blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    
+      <a href="/">
+        <li class="mobile-menu-item">
+          
+          
+            Home
+          
+        </li>
+      </a>
+    
+      <a href="/archives/">
+        <li class="mobile-menu-item">
+          
+          
+            Archives
+          
+        </li>
+      </a>
+    
+      <a href="/tags">
+        <li class="mobile-menu-item">
+          
+          
+            Tags
+          
+        </li>
+      </a>
+    
+      <a href="/categories">
+        <li class="mobile-menu-item">
+          
+          
+            Categories
+          
+        </li>
+      </a>
+    
+      <a href="/about">
+        <li class="mobile-menu-item">
+          
+          
+            About
+          
+        </li>
+      </a>
+    
+  </ul>
+</nav>
+
+    <div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">huangzf's blog</a>
+</div>
+
+<nav class="site-navbar">
+  
+    <ul id="menu" class="menu">
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/">
+            
+            
+              Home
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/archives/">
+            
+            
+              Archives
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/tags">
+            
+            
+              Tags
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/categories">
+            
+            
+              Categories
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/about">
+            
+            
+              About
+            
+          </a>
+        </li>
+      
+      
+    </ul>
+  
+</nav>
+
+      </header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content">
+            
+  
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">
+        
+          你的分布式锁安全吗?
+        
+      </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          Sep 4, 2016
+        </span>
+      </div>
+    </header>
+
+    
+    
+  <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">Contents</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#你为什么要用分布式锁"><span class="toc-text">你为什么要用分布式锁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#问题分析"><span class="toc-text">问题分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#解决方法"><span class="toc-text">解决方法</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#不要用System-currentTimeMillis"><span class="toc-text">不要用System.currentTimeMillis</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#unlock加入token校验"><span class="toc-text">unlock加入token校验</span></a></li></ol></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#最后"><span class="toc-text">最后</span></a></li></ol>
+    </div>
+  </div>
+
+
+    <div class="post-content">
+      
+        <p>首先你必须弄清楚，用分布式锁来做什么？是解决效率问题，还是一致性问题；不能混为一谈，跟个追星族一样，哪个工具火就用哪个，比如Redis很火，什么都用它，锁就想当然的用Redlock；如果是效率问题，那可能还好一些；但是如果是一致性问题，那你得认真对待，你目前的实现方案可能会某一天让你痛苦不堪！<br><a id="more"></a></p>
+<h2 id="你为什么要用分布式锁"><a href="#你为什么要用分布式锁" class="headerlink" title="你为什么要用分布式锁"></a>你为什么要用分布式锁</h2><ul>
+<li><p>效率<br>比如分布式多节点，虽然业务有幂等性保护，但是不想让一次任务被调度多次（打印太多错误日志，数据库主键约束，耗费资源）</p>
+</li>
+<li><p>保证准确完整<br>为保证数据状态的准确一致，如果多个节点同时被调度，会造成数据损坏或丢失，或者系统运行状态不可控</p>
+</li>
+</ul>
+<div class="tip"><br>这两种情况，一定要区别对待！<br></div>
+
+<p>如果是后者，你用的方案不是强一致，那不是自欺欺人吗？比如很流行的Redlock本身并非强一致性，却要解决一致性问题，参见<a href="https://aphyr.com/posts/283-jepsen-redis" target="_blank" rel="external">Jepsen test Redis</a>, <a href="https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html" target="_blank" rel="external">How to do distributed locking</a><br>如果是前者，出于效率优化，却大费周折搞了个大规模集群，增加问题的复杂度，或多或少有点大炮打蚊子</p>
+<h2 id="问题分析"><a href="#问题分析" class="headerlink" title="问题分析"></a>问题分析</h2><p>一定要谨慎谨慎，再谨慎！不能github上找一个就用！比如下面这个用Redis实现的，他可没告诉你不适于强一致性要求；你发现问题了吗？</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">lock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">long</span> timeout = timeoutMsecs;</span><br><span class="line">  JedisCommands jedis = jedisPool.getResource();</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="keyword">while</span> (timeout &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">long</span> expires = System.currentTimeMillis() + expireMsecs + <span class="number">1</span>;</span><br><span class="line">        String expiresStr = String.valueOf(expires);</span><br><span class="line">        <span class="keyword">if</span> (jedis.setnx(lockKey, expiresStr) == <span class="number">1</span>) &#123;</span><br><span class="line">          <span class="comment">// lock acquired</span></span><br><span class="line">          jedis.expire(lockKey, (<span class="keyword">int</span>) TimeUnit.MILLISECONDS.toSeconds(expireMsecs) + <span class="number">30</span>);</span><br><span class="line">          locked = <span class="keyword">true</span>;</span><br><span class="line">          <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        String currentValueStr = jedis.get(lockKey);</span><br><span class="line">        <span class="keyword">if</span> (currentValueStr != <span class="keyword">null</span></span><br><span class="line">            &amp;&amp; Long.parseLong(currentValueStr) &lt; System.currentTimeMillis()) &#123;</span><br><span class="line">          <span class="comment">// lock is expired</span></span><br><span class="line">          String oldValueStr = jedis.getSet(lockKey, expiresStr);</span><br><span class="line">          jedis.expire(lockKey, (<span class="keyword">int</span>) TimeUnit.MILLISECONDS.toSeconds(expireMsecs) + <span class="number">30</span>);</span><br><span class="line">          <span class="keyword">if</span> (oldValueStr != <span class="keyword">null</span> &amp;&amp; oldValueStr.equals(currentValueStr)) &#123;</span><br><span class="line">            <span class="comment">// lock acquired</span></span><br><span class="line">            locked = <span class="keyword">true</span>;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        timeout -= <span class="number">100</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">          Thread.sleep(<span class="number">100</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">          <span class="keyword">throw</span> <span class="keyword">new</span> LockException(-<span class="number">1</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">  &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    jedisPool.returnResource(jedis);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我敢说90%多都是这么实现的，<code>setnx =&gt; get =&gt; getSet</code>, 官方文档也是这么给的<a href="http://redis.io/commands/setnx" target="_blank" rel="external">http://redis.io/commands/setnx</a></p>
+<ul>
+<li><p><code>System.currentTimeMillis</code>比较，通过和系统本地时间比较判定超时时间，有待商榷；尤其是大规模集群，时间准同步基本不可能，或多或少都有偏差，网络问题造成delay很难避免</p>
+</li>
+<li><p><code>synchronized</code>多个jvm还有用吗？</p>
+</li>
+</ul>
+<p>考虑这个场景：</p>
+<ol>
+<li>A，B节点同时判定锁超时</li>
+<li>A节点<code>getSet</code>成功，成功获取到锁返回</li>
+<li>B节点<code>getSet</code>, 比较<code>oldValueStr.equals(currentValueStr)</code>，获取锁失败，进入下一轮回</li>
+<li>B节点时钟跳前，执行<code>getSet</code>，比较<code>oldValueStr.equals(currentValueStr)</code>成功，成功获取到锁返回</li>
+</ol>
+<p>这样是不是A，B节点就同时获取到锁了？虽说概率极低，但是还是有这种可能</p>
+<p>继续看unlock方法</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">unlock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  JedisCommands jedis = jedisPool.getResource();</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (locked) &#123;</span><br><span class="line">      jedis.del(lockKey);</span><br><span class="line">      locked = <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    jedisPool.returnResource(jedis);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们知道为了避免死锁，都会设置锁超时时间；这是对的，但是这个unlock实现是有问题的</p>
+<ol>
+<li>A节点成功获取锁</li>
+<li>A节点full gc造成锁超时</li>
+<li>B节点成功获取到锁</li>
+<li>A节点full gc后，任务执行完，调用unlock</li>
+<li>C节点成功获取到锁，此时B，C节点同时占有锁</li>
+</ol>
+<p>虽说超时问题确实很难解决，因为很难断定A节点是真的宕机还是处理很慢，但是问题在于A节点删除了别人的锁</p>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>该解决方法仅限于解决效率问题，不适用于强一致性要求，同时超时情况下有可能多节点同时持有锁；但是会很好的避免上述状况</p>
+<h6 id="不要用System-currentTimeMillis"><a href="#不要用System-currentTimeMillis" class="headerlink" title="不要用System.currentTimeMillis"></a>不要用System.currentTimeMillis</h6><p>用<a href="http://redis.io/commands/set" target="_blank" rel="external">http://redis.io/commands/set</a>, 把【<code>超时时间，key, token</code>】原子塞进Redis，把超时判断逻辑交给Redis（其实Redis也是用系统时间判断的<a href="https://github.com/antirez/redis/blob/edd4d555df57dc84265fdfb4ef59a4678832f6da/src/server.c#L390-L404）" target="_blank" rel="external">https://github.com/antirez/redis/blob/edd4d555df57dc84265fdfb4ef59a4678832f6da/src/server.c#L390-L404）</a></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">boolean</span> <span class="title">tryLock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Jedis jedis = jedis();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="keyword">int</span> timeout = getTimeoutMsecs();</span><br><span class="line">      <span class="keyword">while</span> (timeout &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="string">"OK"</span>.equals(jedis().set(getLockKey(), getToken(), <span class="string">"NX"</span>, <span class="string">"PX"</span>, getExpireMsecs()))) &#123;</span><br><span class="line">          setLocked(<span class="keyword">true</span>);</span><br><span class="line">          <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        timeout -= <span class="number">100</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">          TimeUnit.MILLISECONDS.sleep(<span class="number">100</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">          <span class="keyword">throw</span> <span class="keyword">new</span> LockException(-<span class="number">1</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">      jedis.close();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h6 id="unlock加入token校验"><a href="#unlock加入token校验" class="headerlink" title="unlock加入token校验"></a>unlock加入token校验</h6><p>利用lua脚本，保证原子性</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String DELETE_IF_OWNED =</span><br><span class="line">      <span class="string">"if redis.call('get', KEYS[1]) == ARGV[1] then "</span></span><br><span class="line">          + <span class="string">"return redis.call('del', KEYS[1]) "</span></span><br><span class="line">          + <span class="string">"else "</span></span><br><span class="line">          + <span class="string">"return 0 "</span></span><br><span class="line">          + <span class="string">"end"</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">unlock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Jedis jedis = jedis();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (isLocked()) &#123;</span><br><span class="line">        jedis.eval(DELETE_IF_OWNED, Arrays.asList(getLockKey()), Arrays.asList(getToken()));</span><br><span class="line">        setLocked(<span class="keyword">false</span>);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">      jedis.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>分布式锁服务实现确实很难，但是至少要先明确用来做什么，效率 or 准确性；这样才能选型，若准确性需求，那选择的工具最起码要天生支持一致性(Paxos,Raft,数据库事务机制), 然后再考虑超时等其他问题；</p>
+<p>超时问题是个通病，前面也说到了，目前还没发现很好的解决方法，很多异常检测算法也是概率性的；所以如果需求必须保证准确性，基于数据库事务机制设计会稳妥一些，不可避免侵入业务逻辑，合理权衡</p>
+
+      
+    </div>
+
+    
+      
+      
+
+
+
+      
+      
+    
+
+    
+      <footer class="post-footer">
+        
+          <div class="post-tags">
+            
+              <a href="/tags/redis/">redis</a>
+            
+              <a href="/tags/lock/">lock</a>
+            
+          </div>
+        
+        
+        
+  <nav class="post-nav">
+    
+    
+      <a class="next" href="/2016/07/02/closures-currying-partials/">
+        <span class="next-text nav-default">Closures, Currying, Partials in Scala</span>
+        <span class="prev-text nav-mobile">Next</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    
+  </nav>
+
+      </footer>
+    
+
+  </article>
+
+
+          </div>
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>  
+      </main>
+
+      <footer id="footer" class="footer">
+
+  <div class="social-links">
+    
+      
+        
+          <a href="mailto:michaelhuang12@gmail.com" class="iconfont icon-email" title="email"></a>
+        
+      
+    
+      
+    
+      
+        
+          <a href="https://twitter.com/ZhengfeiHuang" class="iconfont icon-twitter" title="twitter"></a>
+        
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        
+          <a href="https://github.com/michaelhuang" class="iconfont icon-github" title="github"></a>
+        
+      
+    
+      
+    
+      
+    
+      
+    
+    
+    
+      <a href="/atom.xml" class="iconfont icon-rss" title="rss"></a>
+    
+  </div>
+
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://hexo.io/">Hexo</a>
+  </span>
+  
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">
+    
+    &copy; 
+     
+      2015 - 
+    
+    2017
+
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">huangzf</span>
+  </span>
+</div>
+      </footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div>
+
+    
+  
+
+  
+  
+
+
+
+
+    
+  
+
+
+
+
+
+  
+    <script type="text/javascript" src="/lib/jquery/jquery-3.1.1.min.js"></script>
+  
+
+  
+    <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  
+
+  
+    <script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+  
+
+
+    <script type="text/javascript" src="/js/src/even.js?v=2.4.x"></script>
+<script type="text/javascript" src="/js/src/bootstrap.js?v=2.4.x"></script>
+
+    
+  </body>
+</html>
