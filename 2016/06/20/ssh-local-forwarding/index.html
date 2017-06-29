@@ -41,7 +41,7 @@
 <meta property="og:site_name" content="huangzf's blog">
 <meta property="og:description" content="Navicat(localhost) =====&amp;gt; host_a =====&amp;gt; host_b =====&amp;gt; host_database如何跨越host_a，host_b实现本地直连host_database?">
 <meta property="og:image" content="http://michaelhuang.qiniudn.com/navicat-ssh-tunnel.png">
-<meta property="og:updated_time" content="2017-06-29T06:59:14.000Z">
+<meta property="og:updated_time" content="2017-06-29T07:17:14.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ssh local forwarding">
 <meta name="twitter:description" content="Navicat(localhost) =====&amp;gt; host_a =====&amp;gt; host_b =====&amp;gt; host_database如何跨越host_a，host_b实现本地直连host_database?">
@@ -225,7 +225,7 @@
   <div class="post-toc" id="post-toc">
     <h2 class="post-toc-title">Contents</h2>
     <div class="post-toc-content">
-      <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#host-a做端口映射"><span class="toc-text">host_a做端口映射</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Navicat走ssh-tunnel"><span class="toc-text">Navicat走ssh tunnel</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#根据端口查看进程"><span class="toc-text">根据端口查看进程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Reference"><span class="toc-text">Reference</span></a></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#host-a做端口映射"><span class="toc-text">host_a做端口映射</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Navicat走ssh-tunnel"><span class="toc-text">Navicat走ssh tunnel</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#根据端口查看进程"><span class="toc-text">根据端口查看进程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Reference"><span class="toc-text">Reference</span></a></li></ol>
     </div>
   </div>
 
@@ -236,13 +236,13 @@
 <p><code>Navicat(localhost) =====&gt; host_a =====&gt; host_b =====&gt; host_database</code><br>如何跨越host_a，host_b实现本地直连host_database?</p>
 </blockquote>
 <a id="more"></a>
-<h4 id="host-a做端口映射"><a href="#host-a做端口映射" class="headerlink" title="host_a做端口映射"></a>host_a做端口映射</h4><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ssh <span class="_">-f</span>NL 0.0.0.0:10588:127.0.0.1:22 user@host_b</span><br></pre></td></tr></table></figure>
+<h2 id="host-a做端口映射"><a href="#host-a做端口映射" class="headerlink" title="host_a做端口映射"></a>host_a做端口映射</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ssh <span class="_">-f</span>NL 0.0.0.0:10588:127.0.0.1:22 user@host_b</span><br></pre></td></tr></table></figure>
 <p>这样<code>ssh user@host_a -p 10588</code>就会直连到host_b</p>
 <div class="tip"><br><code>0.0.0.0</code>表示其他机器通过连接host_a:10588也能连到host_b<br></div>
 
-<h4 id="Navicat走ssh-tunnel"><a href="#Navicat走ssh-tunnel" class="headerlink" title="Navicat走ssh tunnel"></a>Navicat走ssh tunnel</h4><p><img src="http://michaelhuang.qiniudn.com/navicat-ssh-tunnel.png" alt="navicat-ssh-tunnel"></p>
-<h4 id="根据端口查看进程"><a href="#根据端口查看进程" class="headerlink" title="根据端口查看进程"></a>根据端口查看进程</h4><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># command 1</span></span><br><span class="line">netstat -lnp | grep 10588</span><br><span class="line"></span><br><span class="line"><span class="comment"># command 2</span></span><br><span class="line">lsof -Pnl +M -i4 | grep 10588</span><br></pre></td></tr></table></figure>
-<h4 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h4><ul>
+<h2 id="Navicat走ssh-tunnel"><a href="#Navicat走ssh-tunnel" class="headerlink" title="Navicat走ssh tunnel"></a>Navicat走ssh tunnel</h2><p><img src="http://michaelhuang.qiniudn.com/navicat-ssh-tunnel.png" alt="navicat-ssh-tunnel"></p>
+<h2 id="根据端口查看进程"><a href="#根据端口查看进程" class="headerlink" title="根据端口查看进程"></a>根据端口查看进程</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># command 1</span></span><br><span class="line">netstat -lnp | grep 10588</span><br><span class="line"></span><br><span class="line"><span class="comment"># command 2</span></span><br><span class="line">lsof -Pnl +M -i4 | grep 10588</span><br></pre></td></tr></table></figure>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ul>
 <li><a href="http://pentestmonkey.net/cheat-sheet/ssh-cheat-sheet" target="_blank" rel="external">ssh-cheat-sheet</a></li>
 </ul>
 
@@ -408,6 +408,7 @@
 
     <script type="text/javascript" src="/js/src/even.js?v=2.4.x"></script>
 <script type="text/javascript" src="/js/src/bootstrap.js?v=2.4.x"></script>
+<script type="text/javascript" src="/js/src/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 
     
   </body>

@@ -45,7 +45,7 @@
 <meta property="og:image" content="http://michaelhuang.qiniudn.com/hive-lalian03.png">
 <meta property="og:image" content="http://michaelhuang.qiniudn.com/hive-lalian04.png">
 <meta property="og:image" content="http://michaelhuang.qiniudn.com/hive-lalian05.png">
-<meta property="og:updated_time" content="2017-06-29T06:59:14.000Z">
+<meta property="og:updated_time" content="2017-06-29T07:24:05.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Hive实现拉链存储">
 <meta name="twitter:description" content="什么是拉链存储？数据仓库经常用到，通过给record增加两个字段: 生效日期、失效日期，来记录数据的生命周期变化；好处是既节省存储空间，又保证历史数据变化的完整性，最重要的还能快速访问不同时段的数据快照">
@@ -229,7 +229,7 @@
   <div class="post-toc" id="post-toc">
     <h2 class="post-toc-title">Contents</h2>
     <div class="post-toc-content">
-      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Hive-ODPS实现方法"><span class="toc-text">Hive/ODPS实现方法</span></a></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#原理"><span class="toc-text">原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hive-ODPS实现方法"><span class="toc-text">Hive/ODPS实现方法</span></a></li></ol>
     </div>
   </div>
 
@@ -240,13 +240,14 @@
 <p>什么是拉链存储？数据仓库经常用到，通过给record增加两个字段: 生效日期、失效日期，来记录数据的生命周期变化；好处是既节省存储空间，又保证历史数据变化的完整性，最重要的还能快速访问不同时段的数据快照</p>
 </blockquote>
 <a id="more"></a>
-<p>那为什么叫拉链呢？因为每回新更新record进来后，都会对旧record进行闭链（更改失效日期），同时对新record开链（更改生效日期），就像链条一样，一环扣一环</p>
+<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>那为什么叫拉链呢？因为每回新更新record进来后，都会对旧record进行闭链（更改失效日期），同时对新record开链（更改生效日期），就像链条一样，一环扣一环</p>
 <p>下面以用户数据为例：</p>
 <p><img src="http://michaelhuang.qiniudn.com/hive-lalian01.png" alt="用户基本信息"><br><img src="http://michaelhuang.qiniudn.com/hive-lalian02.png" alt="数据一生"><br><img src="http://michaelhuang.qiniudn.com/hive-lalian03.png" alt="加入拉链日期"><br><img src="http://michaelhuang.qiniudn.com/hive-lalian04.png" alt="取某天快照"><br><img src="http://michaelhuang.qiniudn.com/hive-lalian05.png" alt="取一段时间快照"></p>
 <h2 id="Hive-ODPS实现方法"><a href="#Hive-ODPS实现方法" class="headerlink" title="Hive/ODPS实现方法"></a>Hive/ODPS实现方法</h2><p>Hive两个特性：<code>only write once</code>, <code>schema on read</code><br>一般来说存储底层是HDFS（当然有可能是spark或其他，本文不考虑），所以是做不了update的，update成本都不如覆盖重写了，可以考虑利用<a href="https://cwiki.apache.org/confluence/display/Hive/LanguageManual+WindowingAndAnalytics" target="_blank" rel="external">LEAD Function</a>解决</p>
 <figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">        PRIMARY_KEY,</span><br><span class="line">        EFFECTIVE_DT,</span><br><span class="line">        <span class="keyword">CASE</span></span><br><span class="line">          <span class="keyword">WHEN</span> <span class="keyword">LEAD</span>(EFFECTIVE_DT,<span class="number">1</span>,<span class="literal">null</span>)</span><br><span class="line">            <span class="keyword">OVER</span></span><br><span class="line">              (<span class="keyword">PARTITION</span> <span class="keyword">BY</span> PRIMARY_KEY <span class="keyword">ORDER</span> <span class="keyword">BY</span> EFFECTIVE_DT)</span><br><span class="line">                 <span class="keyword">IS</span> <span class="literal">NULL</span> <span class="keyword">THEN</span> <span class="literal">NULL</span></span><br><span class="line">          <span class="keyword">ELSE</span> <span class="keyword">LEAD</span>(EFFECTIVE_DT,<span class="number">1</span>,<span class="literal">null</span>)</span><br><span class="line">            <span class="keyword">OVER</span></span><br><span class="line">              (<span class="keyword">PARTITION</span> <span class="keyword">BY</span> PRIMARY_KEY <span class="keyword">ORDER</span> <span class="keyword">BY</span> EFFECTIVE_DT)</span><br><span class="line">        <span class="keyword">END</span> <span class="keyword">AS</span> EXPIRED_DT,</span><br><span class="line">        EVENT_VALUE</span><br><span class="line">       <span class="keyword">FROM</span> (</span><br><span class="line">         <span class="keyword">SELECT</span></span><br><span class="line">           PRIMARY_KEY,</span><br><span class="line">           EFFECTIVE_DT,</span><br><span class="line">           EVENT_VALUE</span><br><span class="line">         <span class="keyword">FROM</span></span><br><span class="line">           EXISTING_TIME_SERIES_TABLE</span><br><span class="line">         <span class="keyword">WHERE</span></span><br><span class="line">           EXPIRED_DT <span class="keyword">IS</span> <span class="literal">NULL</span></span><br><span class="line">         <span class="keyword">UNION</span> ALL</span><br><span class="line">         <span class="keyword">SELECT</span></span><br><span class="line">           PRIMARY_KEY,</span><br><span class="line">           EFFECTIVE_DT,</span><br><span class="line">           EVENT_VALUE</span><br><span class="line">         <span class="keyword">FROM</span> NEW_TIME_SERIES_TABLE</span><br><span class="line">       ) sub_1</span><br></pre></td></tr></table></figure>
-<div class="tip"><br>该方法不具有幂等性，重复执行会导致多出<code>EFFECTIVE_DT = EXPIRED_DT</code>的数据；如果无法避免重复执行，子查询里面需要去重<br></div>
-
+<blockquote>
+<p>该方法不具有幂等性，重复执行会导致多出<code>EFFECTIVE_DT = EXPIRED_DT</code>的数据；如果无法避免重复执行，子查询里面需要去重</p>
+</blockquote>
 
       
     </div>
@@ -410,6 +411,7 @@
 
     <script type="text/javascript" src="/js/src/even.js?v=2.4.x"></script>
 <script type="text/javascript" src="/js/src/bootstrap.js?v=2.4.x"></script>
+<script type="text/javascript" src="/js/src/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 
     
   </body>

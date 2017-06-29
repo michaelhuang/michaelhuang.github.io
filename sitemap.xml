@@ -2,79 +2,79 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>http://michaelhuang.github.io/2016/04/01/hive_one/</loc>
-    
-    <lastmod>2017-06-29T06:59:14.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://michaelhuang.github.io/2016/06/26/Functional-Programming-Principles-in-Scala/</loc>
-    
-    <lastmod>2017-06-29T06:59:14.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://michaelhuang.github.io/2016/04/20/Spring-test-dbunit/</loc>
-    
-    <lastmod>2017-06-29T06:59:14.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://michaelhuang.github.io/2016/07/02/closures-currying-partials/</loc>
-    
-    <lastmod>2017-06-29T06:59:14.000Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>http://michaelhuang.github.io/2014/04/01/ssh_one/</loc>
     
-    <lastmod>2017-06-29T06:59:14.000Z</lastmod>
+    <lastmod>2017-06-29T09:19:50.000Z</lastmod>
     
   </url>
   
   <url>
     <loc>http://michaelhuang.github.io/2016/04/03/hive_two/</loc>
     
-    <lastmod>2017-06-29T06:59:14.000Z</lastmod>
+    <lastmod>2017-06-29T09:10:55.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>http://michaelhuang.github.io/2016/04/15/Hadoop-learning-notes-Data-Ingestion/</loc>
+    <loc>http://michaelhuang.github.io/2016/07/02/closures-currying-partials/</loc>
     
-    <lastmod>2017-06-29T06:59:14.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://michaelhuang.github.io/2016/06/06/MIT_linear/</loc>
-    
-    <lastmod>2017-06-29T06:59:14.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://michaelhuang.github.io/2016/06/20/ssh-local-forwarding/</loc>
-    
-    <lastmod>2017-06-29T06:59:14.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://michaelhuang.github.io/2016/09/04/lock_redis/</loc>
-    
-    <lastmod>2017-06-29T06:59:14.000Z</lastmod>
+    <lastmod>2017-06-29T09:09:06.000Z</lastmod>
     
   </url>
   
   <url>
     <loc>http://michaelhuang.github.io/2014/04/02/ssh_two/</loc>
     
-    <lastmod>2017-06-29T06:59:14.000Z</lastmod>
+    <lastmod>2017-06-29T09:00:30.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://michaelhuang.github.io/2016/06/06/MIT_linear/</loc>
+    
+    <lastmod>2017-06-29T08:52:13.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://michaelhuang.github.io/2016/04/01/hive_one/</loc>
+    
+    <lastmod>2017-06-29T07:24:05.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://michaelhuang.github.io/2016/04/15/Hadoop-learning-notes-Data-Ingestion/</loc>
+    
+    <lastmod>2017-06-29T07:21:57.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://michaelhuang.github.io/2016/04/20/Spring-test-dbunit/</loc>
+    
+    <lastmod>2017-06-29T07:19:57.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://michaelhuang.github.io/2016/06/20/ssh-local-forwarding/</loc>
+    
+    <lastmod>2017-06-29T07:17:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://michaelhuang.github.io/2016/06/26/Functional-Programming-Principles-in-Scala/</loc>
+    
+    <lastmod>2017-06-29T07:16:10.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://michaelhuang.github.io/2016/09/04/lock_redis/</loc>
+    
+    <lastmod>2017-06-29T07:11:52.000Z</lastmod>
     
   </url>
   

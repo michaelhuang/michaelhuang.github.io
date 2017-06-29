@@ -12,7 +12,7 @@
 
 
 
-  <meta name="description" content="为何你的remote ssh command会报错(bash)"/>
+  <meta name="description" content="为何你的remote ssh command会报错"/>
 
 
 
@@ -37,15 +37,15 @@
 <meta name="description" content="先说下这问题咋来的，目前开发流程如下：
 +---------------+       scp files...                     +-----------------+| localhost     |  ===================================&amp;gt;  | remote host     ||   for coding  |   remot">
 <meta property="og:type" content="article">
-<meta property="og:title" content="为何你的remote ssh command会报错(bash)">
+<meta property="og:title" content="为何你的remote ssh command会报错">
 <meta property="og:url" content="http://michaelhuang.github.io/2014/04/01/ssh_one/index.html">
 <meta property="og:site_name" content="huangzf's blog">
 <meta property="og:description" content="先说下这问题咋来的，目前开发流程如下：
 +---------------+       scp files...                     +-----------------+| localhost     |  ===================================&amp;gt;  | remote host     ||   for coding  |   remot">
 <meta property="og:image" content="http://wholetsthedogout.qiniudn.com/bash_init.png">
-<meta property="og:updated_time" content="2017-06-29T06:59:14.000Z">
+<meta property="og:updated_time" content="2017-06-29T09:19:50.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="为何你的remote ssh command会报错(bash)">
+<meta name="twitter:title" content="为何你的remote ssh command会报错">
 <meta name="twitter:description" content="先说下这问题咋来的，目前开发流程如下：
 +---------------+       scp files...                     +-----------------+| localhost     |  ===================================&amp;gt;  | remote host     ||   for coding  |   remot">
 <meta name="twitter:image" content="http://wholetsthedogout.qiniudn.com/bash_init.png">
@@ -77,7 +77,7 @@
 
 
 
-    <title> 为何你的remote ssh command会报错(bash) · huangzf's blog </title>
+    <title> 为何你的remote ssh command会报错 · huangzf's blog </title>
   </head>
 
   <body><div id="mobile-navbar" class="mobile-navbar">
@@ -212,7 +212,7 @@
     <header class="post-header">
       <h1 class="post-title">
         
-          为何你的remote ssh command会报错(bash)
+          为何你的remote ssh command会报错
         
       </h1>
 
@@ -228,7 +228,7 @@
   <div class="post-toc" id="post-toc">
     <h2 class="post-toc-title">Contents</h2>
     <div class="post-toc-content">
-      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Shell-modes"><span class="toc-text">Shell modes</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#login"><span class="toc-text">login</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#interactive"><span class="toc-text">interactive</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Test"><span class="toc-text">Test</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Shell-init-files"><span class="toc-text">Shell init files</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Answer"><span class="toc-text">Answer</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Reference"><span class="toc-text">Reference</span></a></li></ol></li></ol></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Shell-modes"><span class="toc-text">Shell modes</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#login"><span class="toc-text">login</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#interactive"><span class="toc-text">interactive</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Test"><span class="toc-text">Test</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Shell-init-files"><span class="toc-text">Shell init files</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Answer"><span class="toc-text">Answer</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Reference"><span class="toc-text">Reference</span></a></li></ol>
     </div>
   </div>
 
@@ -236,29 +236,24 @@
     <div class="post-content">
       
         <p>先说下这问题咋来的，目前开发流程如下：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">+---------------+       scp files...                     +-----------------+</span><br><span class="line">| localhost     |  ===================================&gt;  | remote host     |</span><br><span class="line">|   <span class="keyword">for</span> coding  |   remote ssh <span class="built_in">command</span> <span class="keyword">for</span> compiling     |   <span class="keyword">for</span> compiling |</span><br><span class="line">+---------------+                                        +-----------------+</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">+---------------+       scp files...                     +-----------------+</span><br><span class="line">| localhost     |  ===================================&gt;  | remote host     |</span><br><span class="line">|   for coding  |   remote ssh command for compiling     |   for compiling |</span><br><span class="line">+---------------+                                        +-----------------+</span><br></pre></td></tr></table></figure>
 <p>如上图，代码是本地马吊们敲出来地，so文件是要放到远程开发环境编译出来地；<br>普通青年尼，可能是打开xshell，xftp，先把文件拖上去，然后ssh登陆编译环境，然后make;<br>效率极低不说，逼格也不够啊，于是乎就有了下面代码：</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">scp *<span class="variable">$1</span>*.&#123;gcc,h,pc,cpp&#125; ya-dev:~/src</span><br><span class="line">ssh ya-dev <span class="string">'cd ~/src; ls '</span><span class="string">"*<span class="variable">$1</span>*"</span><span class="string">'.gcc  | xargs -I &#123;&#125; make -f &#123;&#125; ORA_VER=10'</span></span><br></pre></td></tr></table></figure>
 <p>问题来了，远程执行会报错，部分lib库找不到；但是ssh登陆后再执行就没问题~<br><code>ssh ya-dev env</code> 一看，果然缺少很多环境变量，为什么会这样呢，这就要从爷爷粮票的故事讲起了~</p>
 <a id="more"></a>
-<hr>
 <h2 id="Shell-modes"><a href="#Shell-modes" class="headerlink" title="Shell modes"></a>Shell modes</h2><p>主要有以下两种模式</p>
-<h4 id="login"><a href="#login" class="headerlink" title="login"></a>login</h4><ul>
+<h3 id="login"><a href="#login" class="headerlink" title="login"></a>login</h3><ul>
 <li>你打开一个shell或者terminal，提示输入用户名密码才能登陆，这就是个login shell</li>
 <li>如果你打开terminal就能直接用，那non-login shell(Mac OSX特殊一些)</li>
 <li>总玩ubuntu的应该知道，<code>Ctrl</code> + <code>Alt</code> + <code>F1</code>  出来的就是个login shell</li>
 </ul>
-<h4 id="interactive"><a href="#interactive" class="headerlink" title="interactive"></a>interactive</h4><ul>
+<h3 id="interactive"><a href="#interactive" class="headerlink" title="interactive"></a>interactive</h3><ul>
 <li>你打开的shell有prompt，并且它的stdin、stderr都定向到terminal</li>
 <li>上面那是术语，名字就能看出来，互动嘛，你通过ssh登录远程机器，ssh server肯定要给你个pty吧，好让你执行命令</li>
 </ul>
-<hr>
-<h2 id="Test"><a href="#Test" class="headerlink" title="Test"></a>Test</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">me@<span class="built_in">local</span>-mac$  `[[ $- == *i* ]] &amp;&amp; <span class="built_in">echo</span> <span class="string">'Interactive'</span> || <span class="built_in">echo</span> <span class="string">'Not interactive'</span>`</span><br><span class="line">Interactive</span><br><span class="line">me@<span class="built_in">local</span>-mac$  `<span class="built_in">shopt</span> -q login_shell &amp;&amp; <span class="built_in">echo</span> <span class="string">'Login shell'</span> || <span class="built_in">echo</span> <span class="string">'Not login shell'</span>`</span><br><span class="line">Login shell    <span class="comment"># 特殊 for mac osx</span></span><br><span class="line"></span><br><span class="line">me@<span class="built_in">local</span>-mac$  `ssh ubuntu <span class="string">"[[ $- == *i* ]] &amp;&amp; echo 'Interactive' || echo 'Not interactive'"</span>`</span><br><span class="line">Interactive    <span class="comment"># 因为我用的terminal是interactive</span></span><br><span class="line">me@<span class="built_in">local</span>-mac$  `ssh ubuntu <span class="string">"shopt -q login_shell &amp;&amp; echo 'Login shell' || echo 'Not login shell'"</span>`</span><br><span class="line">Not login shell</span><br><span class="line"></span><br><span class="line">me@<span class="built_in">local</span>-ubuntu$ `[[ $- == *i* ]] &amp;&amp; <span class="built_in">echo</span> <span class="string">'Interactive'</span> || <span class="built_in">echo</span> <span class="string">'Not interactive'</span>`</span><br><span class="line">Interactive</span><br><span class="line">me@<span class="built_in">local</span>-ubuntu$ `<span class="built_in">shopt</span> -q login_shell &amp;&amp; <span class="built_in">echo</span> <span class="string">'Login shell'</span> || <span class="built_in">echo</span> <span class="string">'Not login shell'</span>`</span><br><span class="line">Not login shell  <span class="comment"># 有别于mac osx</span></span><br><span class="line"></span><br><span class="line">me@<span class="built_in">local</span>-mac$ `bash test.sh`</span><br><span class="line">Not interactive  <span class="comment"># bash script.sh：non-login,non-interactive; 说明ssh remote command 是 non-login,non-interactive</span></span><br><span class="line">me@<span class="built_in">local</span>-mac$ `cat test.sh`</span><br><span class="line">ssh ubuntu <span class="string">"[[ $- == *i* ]] &amp;&amp; echo 'Interactive' || echo 'Not interactive'"</span></span><br></pre></td></tr></table></figure>
-<hr>
+<h2 id="Test"><a href="#Test" class="headerlink" title="Test"></a>Test</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">me@local-mac$  `[[ $- == *i* ]] &amp;&amp; echo &apos;Interactive&apos; || echo &apos;Not interactive&apos;`</span><br><span class="line">Interactive</span><br><span class="line">me@local-mac$  `shopt -q login_shell &amp;&amp; echo &apos;Login shell&apos; || echo &apos;Not login shell&apos;`</span><br><span class="line">Login shell    # 特殊 for mac osx</span><br><span class="line"></span><br><span class="line">me@local-mac$  `ssh ubuntu &quot;[[ $- == *i* ]] &amp;&amp; echo &apos;Interactive&apos; || echo &apos;Not interactive&apos;&quot;`</span><br><span class="line">Interactive    # 因为我用的terminal是interactive</span><br><span class="line">me@local-mac$  `ssh ubuntu &quot;shopt -q login_shell &amp;&amp; echo &apos;Login shell&apos; || echo &apos;Not login shell&apos;&quot;`</span><br><span class="line">Not login shell</span><br><span class="line"></span><br><span class="line">me@local-ubuntu$ `[[ $- == *i* ]] &amp;&amp; echo &apos;Interactive&apos; || echo &apos;Not interactive&apos;`</span><br><span class="line">Interactive</span><br><span class="line">me@local-ubuntu$ `shopt -q login_shell &amp;&amp; echo &apos;Login shell&apos; || echo &apos;Not login shell&apos;`</span><br><span class="line">Not login shell  # 有别于mac osx</span><br><span class="line"></span><br><span class="line">me@local-mac$ `bash test.sh`</span><br><span class="line">Not interactive  # bash script.sh：non-login,non-interactive; 说明ssh remote command 是 non-login,non-interactive</span><br><span class="line">me@local-mac$ `cat test.sh`</span><br><span class="line">ssh ubuntu &quot;[[ $- == *i* ]] &amp;&amp; echo &apos;Interactive&apos; || echo &apos;Not interactive&apos;&quot;</span><br></pre></td></tr></table></figure>
 <h2 id="Shell-init-files"><a href="#Shell-init-files" class="headerlink" title="Shell init files"></a>Shell init files</h2><p><img src="http://wholetsthedogout.qiniudn.com/bash_init.png" alt="how the bash load init files"></p>
-<hr>
 <h2 id="Answer"><a href="#Answer" class="headerlink" title="Answer"></a>Answer</h2><p>回到开篇问题，为什么少了很多环境变量那，从上图可以看出，俺的脚本是non-login,non-interactive<br>所以.bash_profile,.bashrc都没被执行到~</p>
-<p><em>解决方法</em>：</p>
 <ol>
 <li>用到的变量都加到<code>/etc/environment</code>中，这个就是全局了，如果你不想影响其他用户，请看下一方法</li>
 <li>sshd_config配置项PermitUserEnvironment<ul>
@@ -276,8 +271,7 @@
 </ul>
 </li>
 </ol>
-<hr>
-<h4 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h4><ul>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ul>
 <li><a href="http://capistranorb.com/documentation/faq/why-does-something-work-in-my-ssh-session-but-not-in-capistrano/" target="_blank" rel="external">Why does something work in my SSH session, but not in Capistrano?</a></li>
 <li><a href="http://www.solipsys.co.uk/new/BashInitialisationFiles.html" target="_blank" rel="external">Bash init files</a></li>
 <li><a href="https://github.com/sstephenson/rbenv/wiki/Unix-shell-initialization" target="_blank" rel="external">rbenv unix shell initialization</a></li>
@@ -449,6 +443,7 @@
 
     <script type="text/javascript" src="/js/src/even.js?v=2.4.x"></script>
 <script type="text/javascript" src="/js/src/bootstrap.js?v=2.4.x"></script>
+<script type="text/javascript" src="/js/src/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 
     
   </body>

@@ -228,8 +228,7 @@
         
 
         
-          <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># git push 总特么timeout咋整</span></span><br><span class="line"><span class="comment"># 这个命令是用来调试用的，用来挖地址挺不错的, 我就挖到一个</span></span><br><span class="line">ssh -vT git@github.com</span><br><span class="line"><span class="comment"># ~/.ssh/config</span></span><br><span class="line">Host github.com</span><br><span class="line">  User git</span><br><span class="line">  HostName 192.30.252.131</span><br></pre></td></tr></table></figure>
-<hr>
+          <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># git push 总特么timeout咋整</span><br><span class="line"># 这个命令是用来调试用的，用来挖地址挺不错的, 我就挖到一个</span><br><span class="line">ssh -vT git@github.com</span><br><span class="line"># ~/.ssh/config</span><br><span class="line">Host github.com</span><br><span class="line">  User git</span><br><span class="line">  HostName 192.30.252.131</span><br></pre></td></tr></table></figure>
           <div class="read-more">
             <a href="/2014/04/02/ssh_two/" class="read-more-link">Read more..</a>
           </div>
@@ -249,7 +248,7 @@
     <header class="post-header">
       <h1 class="post-title">
         
-          <a class="post-link" href="/2014/04/01/ssh_one/">为何你的remote ssh command会报错(bash)</a>
+          <a class="post-link" href="/2014/04/01/ssh_one/">为何你的remote ssh command会报错</a>
         
       </h1>
 
@@ -272,7 +271,7 @@
 
         
           <p>先说下这问题咋来的，目前开发流程如下：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">+---------------+       scp files...                     +-----------------+</span><br><span class="line">| localhost     |  ===================================&gt;  | remote host     |</span><br><span class="line">|   <span class="keyword">for</span> coding  |   remote ssh <span class="built_in">command</span> <span class="keyword">for</span> compiling     |   <span class="keyword">for</span> compiling |</span><br><span class="line">+---------------+                                        +-----------------+</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">+---------------+       scp files...                     +-----------------+</span><br><span class="line">| localhost     |  ===================================&gt;  | remote host     |</span><br><span class="line">|   for coding  |   remote ssh command for compiling     |   for compiling |</span><br><span class="line">+---------------+                                        +-----------------+</span><br></pre></td></tr></table></figure>
 <p>如上图，代码是本地马吊们敲出来地，so文件是要放到远程开发环境编译出来地；<br>普通青年尼，可能是打开xshell，xftp，先把文件拖上去，然后ssh登陆编译环境，然后make;<br>效率极低不说，逼格也不够啊，于是乎就有了下面代码：</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">scp *<span class="variable">$1</span>*.&#123;gcc,h,pc,cpp&#125; ya-dev:~/src</span><br><span class="line">ssh ya-dev <span class="string">'cd ~/src; ls '</span><span class="string">"*<span class="variable">$1</span>*"</span><span class="string">'.gcc  | xargs -I &#123;&#125; make -f &#123;&#125; ORA_VER=10'</span></span><br></pre></td></tr></table></figure>
 <p>问题来了，远程执行会报错，部分lib库找不到；但是ssh登陆后再执行就没问题~<br><code>ssh ya-dev env</code> 一看，果然缺少很多环境变量，为什么会这样呢，这就要从爷爷粮票的故事讲起了~</p>
@@ -451,6 +450,7 @@
 
     <script type="text/javascript" src="/js/src/even.js?v=2.4.x"></script>
 <script type="text/javascript" src="/js/src/bootstrap.js?v=2.4.x"></script>
+<script type="text/javascript" src="/js/src/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 
     
   </body>

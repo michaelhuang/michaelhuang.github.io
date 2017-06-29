@@ -40,7 +40,7 @@
 <meta property="og:url" content="http://michaelhuang.github.io/2014/04/02/ssh_two/index.html">
 <meta property="og:site_name" content="huangzf's blog">
 <meta property="og:description" content="# git push 总特么timeout咋整# 这个命令是用来调试用的，用来挖地址挺不错的, 我就挖到一个ssh -vT git@github.com# ~/.ssh/configHost github.com  User git  HostName 192.30.252.131">
-<meta property="og:updated_time" content="2017-06-29T06:59:14.000Z">
+<meta property="og:updated_time" content="2017-06-29T09:00:30.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="好玩的ssh">
 <meta name="twitter:description" content="# git push 总特么timeout咋整# 这个命令是用来调试用的，用来挖地址挺不错的, 我就挖到一个ssh -vT git@github.com# ~/.ssh/configHost github.com  User git  HostName 192.30.252.131">
@@ -223,29 +223,24 @@
   <div class="post-toc" id="post-toc">
     <h2 class="post-toc-title">Contents</h2>
     <div class="post-toc-content">
-      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#ssh-agent-forwaring"><span class="toc-text">ssh agent forwaring</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ssh-local-port-forwarding"><span class="toc-text">ssh local port forwarding</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#git-push总提示输入username-passwd"><span class="toc-text">git push总提示输入username/passwd</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#神器-OSX-Fuse"><span class="toc-text">神器 OSX Fuse</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#vim-emacs-编辑远程文件"><span class="toc-text">vim / emacs 编辑远程文件</span></a></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#ssh-agent-forwarding"><span class="toc-text">ssh agent forwarding</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ssh-local-port-forwarding"><span class="toc-text">ssh local port forwarding</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#git-push总提示输入username-passwd"><span class="toc-text">git push总提示输入username/passwd</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#神器-OSX-Fuse"><span class="toc-text">神器 OSX Fuse</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#vim-emacs-编辑远程文件"><span class="toc-text">vim / emacs 编辑远程文件</span></a></li></ol>
     </div>
   </div>
 
 
     <div class="post-content">
       
-        <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># git push 总特么timeout咋整</span></span><br><span class="line"><span class="comment"># 这个命令是用来调试用的，用来挖地址挺不错的, 我就挖到一个</span></span><br><span class="line">ssh -vT git@github.com</span><br><span class="line"><span class="comment"># ~/.ssh/config</span></span><br><span class="line">Host github.com</span><br><span class="line">  User git</span><br><span class="line">  HostName 192.30.252.131</span><br></pre></td></tr></table></figure>
-<hr>
+        <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># git push 总特么timeout咋整</span><br><span class="line"># 这个命令是用来调试用的，用来挖地址挺不错的, 我就挖到一个</span><br><span class="line">ssh -vT git@github.com</span><br><span class="line"># ~/.ssh/config</span><br><span class="line">Host github.com</span><br><span class="line">  User git</span><br><span class="line">  HostName 192.30.252.131</span><br></pre></td></tr></table></figure>
 <a id="more"></a>
-<h2 id="ssh-agent-forwaring"><a href="#ssh-agent-forwaring" class="headerlink" title="ssh agent forwaring"></a><a href="http://www.unixwiz.net/techtips/ssh-agent-forwarding.html" target="_blank" rel="external">ssh agent forwaring</a></h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">+---------+     git push        +---------+       git <span class="built_in">clone</span>/pull      +---------+</span><br><span class="line">|  client | =================&gt;  |  github |    ==================&gt;    |  server |</span><br><span class="line">|         |                     |         |                           |         |</span><br><span class="line">+---------+                     +---------+                           +---------+</span><br></pre></td></tr></table></figure>
+<h2 id="ssh-agent-forwarding"><a href="#ssh-agent-forwarding" class="headerlink" title="ssh agent forwarding"></a><a href="http://www.unixwiz.net/techtips/ssh-agent-forwarding.html" target="_blank" rel="external">ssh agent forwarding</a></h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">+---------+     git push        +---------+       git clone/pull      +---------+</span><br><span class="line">|  client | =================&gt;  |  github |    ==================&gt;    |  server |</span><br><span class="line">|         |                     |         |                           |         |</span><br><span class="line">+---------+                     +---------+                           +---------+</span><br></pre></td></tr></table></figure>
 <p>这个特性，deploy server的时候很方便；只需要添加client端的公钥到github即可~<br><a href="https://developer.github.com/guides/using-ssh-agent-forwarding/" target="_blank" rel="external">如何配置请温柔地点击我</a></p>
-<hr>
 <h2 id="ssh-local-port-forwarding"><a href="#ssh-local-port-forwarding" class="headerlink" title="ssh local port forwarding"></a>ssh local port forwarding</h2><p>出于安全考虑，server常规接口一般都会屏蔽掉，只留下80/443(webservers)、22(ssh, 当然sshd_config中可以更换掉), 但是有时候可能需要连接数据库，比如mysql(3306)，但是本地3306接口被屏蔽掉了，如何破？</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 连接本地10588接口即可连接远端mysql数据库_</span></span><br><span class="line"><span class="comment">#   -f    _后台运行_</span></span><br><span class="line"><span class="comment">#   -N    _禁止执行ssh remote command_</span></span><br><span class="line"><span class="comment">#   -L    _本地接口定向_</span></span><br><span class="line">ssh <span class="_">-f</span> -N -L 10588:127.0.0.1:3306 name@database.example.com</span><br><span class="line"></span><br><span class="line"><span class="comment"># ~/.ssh/config</span></span><br><span class="line">Host tunnel</span><br><span class="line">  HostName database.example.com</span><br><span class="line">  IdentityFile ~/.ssh/database.example.key</span><br><span class="line">  LocalForward 10588 127.0.0.1:3306</span><br><span class="line">  User name</span><br><span class="line"></span><br><span class="line">ssh <span class="_">-f</span> -N tunnel</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 连接本地10588接口即可连接远端mysql数据库_</span><br><span class="line">#   -f    _后台运行_</span><br><span class="line">#   -N    _禁止执行ssh remote command_</span><br><span class="line">#   -L    _本地接口定向_</span><br><span class="line">ssh -f -N -L 10588:127.0.0.1:3306 name@database.example.com</span><br><span class="line"></span><br><span class="line"># ~/.ssh/config</span><br><span class="line">Host tunnel</span><br><span class="line">  HostName database.example.com</span><br><span class="line">  IdentityFile ~/.ssh/database.example.key</span><br><span class="line">  LocalForward 10588 127.0.0.1:3306</span><br><span class="line">  User name</span><br><span class="line"></span><br><span class="line">ssh -f -N tunnel</span><br></pre></td></tr></table></figure>
 <p><a href="http://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers" target="_blank" rel="external">Well known ports</a></p>
-<hr>
-<h2 id="git-push总提示输入username-passwd"><a href="#git-push总提示输入username-passwd" class="headerlink" title="git push总提示输入username/passwd"></a>git push总提示输入username/passwd</h2><p>这是因为clone的时候用的https，改成ssh clone url<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git remote <span class="built_in">set</span>-url origin git@github.com:username/repo.git</span><br></pre></td></tr></table></figure></p>
-<hr>
+<h2 id="git-push总提示输入username-passwd"><a href="#git-push总提示输入username-passwd" class="headerlink" title="git push总提示输入username/passwd"></a>git push总提示输入username/passwd</h2><p>这是因为clone的时候用的https，改成ssh clone url</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git remote <span class="built_in">set</span>-url origin git@github.com:username/repo.git</span><br></pre></td></tr></table></figure>
 <h2 id="神器-OSX-Fuse"><a href="#神器-OSX-Fuse" class="headerlink" title="神器 OSX Fuse"></a>神器 <a href="http://osxfuse.github.io/" target="_blank" rel="external">OSX Fuse</a></h2><p>scp这命令都知道啊，但是命令敲起来还是有点麻烦，能不能直接像操作本地文件系统一样操作远程文件那？装上他，只需要将远程文件夹挂载到本地指定文件路径即可实现</p>
-<hr>
 <h2 id="vim-emacs-编辑远程文件"><a href="#vim-emacs-编辑远程文件" class="headerlink" title="vim / emacs 编辑远程文件"></a>vim / emacs 编辑远程文件</h2><p><a href="http://vim.wikia.com/wiki/Editing_remote_files_via_scp_in_vim" target="_blank" rel="external">for vim</a><br><a href="https://www.gnu.org/software/emacs/manual/html_node/emacs/Remote-Files.html" target="_blank" rel="external">for emacs</a></p>
-<hr>
 
       
     </div>
@@ -281,7 +276,7 @@
     
     
       <a class="next" href="/2014/04/01/ssh_one/">
-        <span class="next-text nav-default">为何你的remote ssh command会报错(bash)</span>
+        <span class="next-text nav-default">为何你的remote ssh command会报错</span>
         <span class="prev-text nav-mobile">Next</span>
         <i class="iconfont icon-right"></i>
       </a>
@@ -409,6 +404,7 @@
 
     <script type="text/javascript" src="/js/src/even.js?v=2.4.x"></script>
 <script type="text/javascript" src="/js/src/bootstrap.js?v=2.4.x"></script>
+<script type="text/javascript" src="/js/src/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 
     
   </body>

@@ -44,7 +44,7 @@
 <meta property="og:image" content="http://michaelhuang.qiniudn.com/hive/XFileInputFormat.png">
 <meta property="og:image" content="http://michaelhuang.qiniudn.com/hive/XRecordReader.png">
 <meta property="og:image" content="http://michaelhuang.qiniudn.com/hive/XSerDe.png">
-<meta property="og:updated_time" content="2017-06-29T06:59:14.000Z">
+<meta property="og:updated_time" content="2017-06-29T09:10:55.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Hive自定义文件读取">
 <meta name="twitter:description" content="考虑这么个场景：某天你leader过来跟你说，我这现在有大量文本文件，大小不一，大的好几十G，小的几百兆；现在想提取出来共有的几个业务字段做分析，但是每种类型的接口文件的字段解析规则还不一样，比如业务字段A，在file1里面在第10字节到18字节之间，在file2中在第8字节到第16字节之间，问你怎么办？">
@@ -228,7 +228,7 @@
   <div class="post-toc" id="post-toc">
     <h2 class="post-toc-title">Contents</h2>
     <div class="post-toc-content">
-      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Inputformat"><span class="toc-text">Inputformat</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#RecordReader"><span class="toc-text">RecordReader</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Serde"><span class="toc-text">Serde</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hive-Sql-定义"><span class="toc-text">Hive Sql 定义</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Answer"><span class="toc-text">Answer</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Reference"><span class="toc-text">Reference</span></a></li></ol></li></ol></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Inputformat"><span class="toc-text">Inputformat</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#RecordReader"><span class="toc-text">RecordReader</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Serde"><span class="toc-text">Serde</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hive-Sql-定义"><span class="toc-text">Hive Sql 定义</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Answer"><span class="toc-text">Answer</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Reference"><span class="toc-text">Reference</span></a></li></ol>
     </div>
   </div>
 
@@ -260,15 +260,14 @@
 <li><a href="http://db3.iteye.com/blog/1072778" target="_blank" rel="external">ObjectInspector</a>很精髓！</li>
 </ul>
 <p><img src="http://michaelhuang.qiniudn.com/hive/XSerDe.png" alt="XSerDe"></p>
-<h2 id="Hive-Sql-定义"><a href="#Hive-Sql-定义" class="headerlink" title="Hive Sql 定义"></a>Hive Sql 定义</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">hive -e "<span class="keyword">CREATE</span> <span class="keyword">EXTERNAL</span> <span class="keyword">TABLE</span> <span class="keyword">IF</span> <span class="keyword">NOT</span> <span class="keyword">EXISTS</span> khala_his.dwd_acco_his</span><br><span class="line">(</span><br><span class="line">  c_clientid <span class="keyword">STRING</span>,</span><br><span class="line">  c_custname <span class="keyword">STRING</span>,</span><br><span class="line">  d_datadate <span class="built_in">DATE</span></span><br><span class="line">  ...</span><br><span class="line">)</span><br><span class="line">PARTITIONED <span class="keyword">BY</span> (<span class="keyword">year</span> <span class="built_in">INT</span>, <span class="keyword">month</span> <span class="built_in">INT</span>, <span class="keyword">day</span> <span class="built_in">INT</span>)</span><br><span class="line"><span class="keyword">ROW</span> <span class="keyword">FORMAT</span> SERDE <span class="string">'com.michael.hive.XSerDe'</span></span><br><span class="line"><span class="keyword">STORED</span> <span class="keyword">AS</span></span><br><span class="line">  INPUTFORMAT <span class="string">'com.michael.hive.XFileInputFormat'</span></span><br><span class="line">  OUTPUTFORMAT <span class="string">'com.michael.hive.XFileOutputFormat'</span></span><br><span class="line">LOCATION <span class="string">'/data/khala/his/dwd_acco_his'</span></span><br></pre></td></tr></table></figure>
+<h2 id="Hive-Sql-定义"><a href="#Hive-Sql-定义" class="headerlink" title="Hive Sql 定义"></a>Hive Sql 定义</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">hive -e &quot;CREATE EXTERNAL TABLE IF NOT EXISTS khala_his.dwd_acco_his</span><br><span class="line">(</span><br><span class="line">  c_clientid STRING,</span><br><span class="line">  c_custname STRING,</span><br><span class="line">  d_datadate DATE</span><br><span class="line">  ...</span><br><span class="line">)</span><br><span class="line">PARTITIONED BY (year INT, month INT, day INT)</span><br><span class="line">ROW FORMAT SERDE &apos;com.michael.hive.XSerDe&apos;</span><br><span class="line">STORED AS</span><br><span class="line">  INPUTFORMAT &apos;com.michael.hive.XFileInputFormat&apos;</span><br><span class="line">  OUTPUTFORMAT &apos;com.michael.hive.XFileOutputFormat&apos;</span><br><span class="line">LOCATION &apos;/data/khala/his/dwd_acco_his&apos;</span><br></pre></td></tr></table></figure>
 <h2 id="Answer"><a href="#Answer" class="headerlink" title="Answer"></a>Answer</h2><p>说到这，还有个关键问题没解决，如何解决同一表schema适配不同文本文件呢？只需两步</p>
 <ul>
 <li><code>RecordReader</code>把文件名<code>split.getPath().getName()</code>拼到每一个row末尾，相当于加一个虚拟列，用来索引对应row解析规则</li>
 <li><code>SerDe</code>解析字段规则时，根据虚拟列获取到解析规则，然后解析即可</li>
 </ul>
-<div class="tip"><br><code>org.apache.hadoop.io.Text</code>标准UTF8编码，如果你的文本不是UTF8，生成row时要用<code>getBytes()</code>，非<code>toString()</code>；<br>解析类型时候，DECIMAL要用HiveDecimal.create(BigDecimal decimal)，DATE用java.sql.Date()<br></div>
-
-<h4 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h4><ul>
+<p><code>org.apache.hadoop.io.Text</code>标准UTF8编码，如果你的文本不是UTF8，生成row时要用<code>getBytes()</code>，非<code>toString()</code>；<br>解析类型时候，DECIMAL要用HiveDecimal.create(BigDecimal decimal)，DATE用java.sql.Date()</p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ul>
 <li><a href="https://cwiki.apache.org/confluence/display/Hive/SerDe" target="_blank" rel="external">Apache Hive Serde</a></li>
 <li><a href="http://www.dummies.com/how-to/content/defining-table-record-formats-in-hive.html" target="_blank" rel="external">defining table record formats in Hive</a></li>
 <li><a href="http://www.coder4.com/archives/4031" target="_blank" rel="external">Hive中的InputFormat、OutputFormat与SerDe</a></li>
@@ -436,6 +435,7 @@
 
     <script type="text/javascript" src="/js/src/even.js?v=2.4.x"></script>
 <script type="text/javascript" src="/js/src/bootstrap.js?v=2.4.x"></script>
+<script type="text/javascript" src="/js/src/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 
     
   </body>

@@ -54,7 +54,7 @@ schema是否要频繁变更？
 查询的时候倾向于就那么几列，还是所有列？
 数据导入速度要求，及下游使用（比如查询）可容忍程度如何？
 集群平台自建？还是别的厂商？…">
-<meta property="og:updated_time" content="2017-06-29T06:59:14.000Z">
+<meta property="og:updated_time" content="2017-06-29T07:21:57.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Data Ingestion">
 <meta name="twitter:description" content="数据导入的时候需要考虑哪些因素? No Silver Bullet.
@@ -244,7 +244,7 @@ schema是否要频繁变更？
   <div class="post-toc" id="post-toc">
     <h2 class="post-toc-title">Contents</h2>
     <div class="post-toc-content">
-      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Data-Ingestion-Considerations"><span class="toc-text">Data Ingestion Considerations</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#Timeliness-of-data-ingestion-and-accessibility"><span class="toc-text">Timeliness of data ingestion and accessibility</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#Storage-format"><span class="toc-text">Storage format</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#Codecs"><span class="toc-text">Codecs</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#Incremental-updates"><span class="toc-text">Incremental updates</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#Data-access-pattern"><span class="toc-text">Data access pattern</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#Source-system-and-data-structure"><span class="toc-text">Source system and data structure</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#Network-Bottlenecks"><span class="toc-text">Network Bottlenecks</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#Network-Security"><span class="toc-text">Network Security</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#Failure-Handling"><span class="toc-text">Failure Handling</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#Level-of-Complexity"><span class="toc-text">Level of Complexity</span></a></li></ol></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Reference"><span class="toc-text">Reference</span></a></li></ol></li></ol></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Data-Ingestion-Considerations"><span class="toc-text">Data Ingestion Considerations</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Timeliness-of-data-ingestion-and-accessibility"><span class="toc-text">Timeliness of data ingestion and accessibility</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Storage-format"><span class="toc-text">Storage format</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Codecs"><span class="toc-text">Codecs</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Incremental-updates"><span class="toc-text">Incremental updates</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Data-access-pattern"><span class="toc-text">Data access pattern</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Source-system-and-data-structure"><span class="toc-text">Source system and data structure</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Network-Bottlenecks"><span class="toc-text">Network Bottlenecks</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Network-Security"><span class="toc-text">Network Security</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Failure-Handling"><span class="toc-text">Failure Handling</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Level-of-Complexity"><span class="toc-text">Level of Complexity</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Reference"><span class="toc-text">Reference</span></a></li></ol>
     </div>
   </div>
 
@@ -261,7 +261,7 @@ schema是否要频繁变更？
 <li>集群平台自建？还是别的厂商？<br>…</li>
 </ul>
 <a id="more"></a>
-<h2 id="Data-Ingestion-Considerations"><a href="#Data-Ingestion-Considerations" class="headerlink" title="Data Ingestion Considerations"></a>Data Ingestion Considerations</h2><h6 id="Timeliness-of-data-ingestion-and-accessibility"><a href="#Timeliness-of-data-ingestion-and-accessibility" class="headerlink" title="Timeliness of data ingestion and accessibility"></a>Timeliness of data ingestion and accessibility</h6><p>数据导入频率什么级别，需要多久能供下游使用？</p>
+<h2 id="Data-Ingestion-Considerations"><a href="#Data-Ingestion-Considerations" class="headerlink" title="Data Ingestion Considerations"></a>Data Ingestion Considerations</h2><h3 id="Timeliness-of-data-ingestion-and-accessibility"><a href="#Timeliness-of-data-ingestion-and-accessibility" class="headerlink" title="Timeliness of data ingestion and accessibility"></a>Timeliness of data ingestion and accessibility</h3><p>数据导入频率什么级别，需要多久能供下游使用？</p>
 <table>
 <thead>
 <tr>
@@ -304,7 +304,7 @@ schema是否要频繁变更？
 </tr>
 </tbody>
 </table>
-<h6 id="Storage-format"><a href="#Storage-format" class="headerlink" title="Storage format"></a>Storage format</h6><p>存储格式主要这几种，纯文本，Hadoop原生的Sequence File，序列化Avro，列存储Parquet和ORC(optimized RCFile)</p>
+<h3 id="Storage-format"><a href="#Storage-format" class="headerlink" title="Storage format"></a>Storage format</h3><p>存储格式主要这几种，纯文本，Hadoop原生的Sequence File，序列化Avro，列存储Parquet和ORC(optimized RCFile)</p>
 <table>
 <thead>
 <tr>
@@ -355,7 +355,7 @@ schema是否要频繁变更？
 </table>
 <p>频繁变更的，比如schema、查询结果字段集，Avro更合适；如果查询结果集字段很固定，对写入速度没有要求，Parquet更合适；只想快速导入到HDFS，Text无疑是最快的，但是通常情况下没有人会这样做，比如xml，not splittable，意味着不能并行处理，再就是很耗磁盘网络IO，通常都要压缩，但是又不支持block compression(压缩后not splittable)；ORC是HortonWorks开发的，厂商竞争导致Cloudera Impala用不了，所以Cloudera和twitter一起搞出个Parquet；SequenceFiles类似于csv，但是支持block compression，通常作为MapReduce jobs的过程存储；</p>
 <p>格式的选择没那么绝对，选了这个，就不能选那个了，通常都会配合使用，比如processing阶段使用SequenceFiles，query阶段使用Parquet，extract可能选择csv(方便导入数据库)</p>
-<h6 id="Codecs"><a href="#Codecs" class="headerlink" title="Codecs"></a>Codecs</h6><p>压缩格式如何选择？</p>
+<h3 id="Codecs"><a href="#Codecs" class="headerlink" title="Codecs"></a>Codecs</h3><p>压缩格式如何选择？</p>
 <table>
 <thead>
 <tr>
@@ -398,26 +398,26 @@ schema是否要频繁变更？
 </tbody>
 </table>
 <p>从表中可以看出，大多数情况hot data使用Snappy即可，如果是纯文本则使用LZO会更方便一些；cold data建议Gzip；追求更高的压缩比建议bzip2</p>
-<h6 id="Incremental-updates"><a href="#Incremental-updates" class="headerlink" title="Incremental updates"></a>Incremental updates</h6><p>新数据以什么形式落地？append or need modifying existing data?<br>只是append，那直接灌到HDFS即可；如果需要merge，对于HDFS来说，需要一个Compact job，对增量数据和现有数据做merge，比如用Hive的left join</p>
-<h6 id="Data-access-pattern"><a href="#Data-access-pattern" class="headerlink" title="Data access pattern"></a>Data access pattern</h6><p>batch processing jobs? Or is random access?<br>如果是大量的扫描批处理，那HDFS更合适；如果是随机的访问数据，那NoSQL(比如Hbase)更合适</p>
-<h6 id="Source-system-and-data-structure"><a href="#Source-system-and-data-structure" class="headerlink" title="Source system and data structure"></a>Source system and data structure</h6><p>数据源类型：RDBMS or Logs？数据类型：structured、semistructured or unstructured?</p>
+<h3 id="Incremental-updates"><a href="#Incremental-updates" class="headerlink" title="Incremental updates"></a>Incremental updates</h3><p>新数据以什么形式落地？append or need modifying existing data?<br>只是append，那直接灌到HDFS即可；如果需要merge，对于HDFS来说，需要一个Compact job，对增量数据和现有数据做merge，比如用Hive的left join</p>
+<h3 id="Data-access-pattern"><a href="#Data-access-pattern" class="headerlink" title="Data access pattern"></a>Data access pattern</h3><p>batch processing jobs? Or is random access?<br>如果是大量的扫描批处理，那HDFS更合适；如果是随机的访问数据，那NoSQL(比如Hbase)更合适</p>
+<h3 id="Source-system-and-data-structure"><a href="#Source-system-and-data-structure" class="headerlink" title="Source system and data structure"></a>Source system and data structure</h3><p>数据源类型：RDBMS or Logs？数据类型：structured、semistructured or unstructured?</p>
 <ul>
 <li><a href="https://github.com/alexholmes/hdfs-file-slurper" target="_blank" rel="external">hdfs-file-slurper</a><br>轻量级传输工具，多并发，单机多实例，简单容错处理，LZO压缩，定制脚本等</li>
 <li><a href="https://sqoop.apache.org/docs/1.99.1/index.html" target="_blank" rel="external">Sqoop</a><br>Hadoop和RDBMS间批量传输利器</li>
 <li><a href="http://flume.apache.org/" target="_blank" rel="external">Flume</a><br>日志收集利器</li>
 <li><a href="http://kafka.apache.org/" target="_blank" rel="external">Kafka</a>和<a href="https://www.elastic.co/products/logstash" target="_blank" rel="external">logstash</a><br>再加上Elasticsearch, elk日志收集黄金搭档！</li>
 </ul>
-<h6 id="Network-Bottlenecks"><a href="#Network-Bottlenecks" class="headerlink" title="Network Bottlenecks"></a>Network Bottlenecks</h6><p>做好监控，网卡瓶颈，传输数据压缩</p>
-<h6 id="Network-Security"><a href="#Network-Security" class="headerlink" title="Network Security"></a>Network Security</h6><p>数据脱敏，加密解密；如果用Flume，agents之间传输数据支持加密的；用Kafka就需要额外的处理过程</p>
-<h6 id="Failure-Handling"><a href="#Failure-Handling" class="headerlink" title="Failure Handling"></a>Failure Handling</h6><p>容错机制：</p>
+<h3 id="Network-Bottlenecks"><a href="#Network-Bottlenecks" class="headerlink" title="Network Bottlenecks"></a>Network Bottlenecks</h3><p>做好监控，网卡瓶颈，传输数据压缩</p>
+<h3 id="Network-Security"><a href="#Network-Security" class="headerlink" title="Network Security"></a>Network Security</h3><p>数据脱敏，加密解密；如果用Flume，agents之间传输数据支持加密的；用Kafka就需要额外的处理过程</p>
+<h3 id="Failure-Handling"><a href="#Failure-Handling" class="headerlink" title="Failure Handling"></a>Failure Handling</h3><p>容错机制：</p>
 <ul>
 <li>传输10个文件，如果有一个失败了，能否知道是哪个，这样重传的时候只需要传这个失败的就行了</li>
 <li>用dfs put传输一个10G大小的文件，传完9G时断了，就得重头来</li>
 <li>走队列传，可能会导致一条记录duplicate，接收端需要去重</li>
 </ul>
-<h6 id="Level-of-Complexity"><a href="#Level-of-Complexity" class="headerlink" title="Level of Complexity"></a>Level of Complexity</h6><p>复杂程度：不要把问题过于复杂化；比如说就是想简单传几个文件上去，就没必要非得搞个Flume或者Kafka集群，直接fs put不就行了；</p>
+<h3 id="Level-of-Complexity"><a href="#Level-of-Complexity" class="headerlink" title="Level of Complexity"></a>Level of Complexity</h3><p>复杂程度：不要把问题过于复杂化；比如说就是想简单传几个文件上去，就没必要非得搞个Flume或者Kafka集群，直接fs put不就行了；</p>
 <p>好的设计不是大而全，而是简而美；不要总想还能加什么，而是可以砍掉什么</p>
-<h4 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h4><ul>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ul>
 <li><a href="https://www.manning.com/books/hadoop-in-action-second-edition" target="_blank" rel="external">Hadoop in Action</a></li>
 <li><a href="http://shop.oreilly.com/product/0636920033196.do" target="_blank" rel="external">Hadoop Application Architectures</a></li>
 <li><a href="http://shop.oreilly.com/product/0636920033448.do" target="_blank" rel="external">Hadoop: The Definitive Guide</a></li>
@@ -591,6 +591,7 @@ schema是否要频繁变更？
 
     <script type="text/javascript" src="/js/src/even.js?v=2.4.x"></script>
 <script type="text/javascript" src="/js/src/bootstrap.js?v=2.4.x"></script>
+<script type="text/javascript" src="/js/src/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 
     
   </body>
